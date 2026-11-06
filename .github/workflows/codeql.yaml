@@ -1,0 +1,255 @@
+name: "CodeQL Security Analysis"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight UTC
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read  # Default to read-only; the analyze job overrides where required
+
+jobs:
+  analyze:
+    name: "Security Scan (CodeQL)"
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # 'csharp' analyses the compiled library (needs a build); 'actions'
+        # analyses the workflow files themselves (build-mode none, no build).
+        language: [ 'csharp', 'actions' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - name: Check for C# source code
+      id: check-csharp
+      if: matrix.language == 'csharp'
+      shell: pwsh
+      run: |
+        Write-Host "=== CodeQL C# Source Code Detection ===" -ForegroundColor Cyan
+        Write-Host "Searching for C# source files using git index..." -ForegroundColor Cyan
+        
+        # Use git ls-files to efficiently find C# files (respects .gitignore and doesn't traverse excluded dirs)
+        $csharpFiles = @()
+        try {
+          $gitOutput = git ls-files '*.cs' '*.csproj' 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            $csharpFiles = @($gitOutput | Where-Object { $_ })
+          } else {
+            Write-Warning "git ls-files failed with exit code $LASTEXITCODE. Falling back to filesystem search for C# files."
+          }
+        } catch {
+          Write-Warning "Exception while running git ls-files: $($_.Exception.Message). Falling back to filesystem search for C# files."
+        }
+
+        if (-not $csharpFiles -or $csharpFiles.Count -eq 0) {
+          Write-Host "git ls-files did not return any C# files. Scanning the filesystem for *.cs and *.csproj files..." -ForegroundColor Cyan
+          $csharpFiles = @(Get-ChildItem -Path . -Recurse -Include *.cs,*.csproj -File -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
+        }
+        $csharpFileCount = $csharpFiles.Count
+        
+        Write-Host "" -ForegroundColor Cyan
+        if ($csharpFileCount -eq 0) {
+          Write-Host "⚠️  No C# source code found." -ForegroundColor Yellow
+          Write-Host "   This appears to be an empty repository or a repository without projects." -ForegroundColor Yellow
+          Write-Host "   CodeQL analysis will be SKIPPED, but the job will complete successfully." -ForegroundColor Yellow
+          Write-Host "   This ensures branch protection requirements are met." -ForegroundColor Yellow
+          echo "has-csharp=false" >> $env:GITHUB_OUTPUT
+        } else {
+          Write-Host "✅ Found $csharpFileCount C# file(s)." -ForegroundColor Green
+          Write-Host "   CodeQL analysis will PROCEED." -ForegroundColor Green
+          echo "has-csharp=true" >> $env:GITHUB_OUTPUT
+        }
+        Write-Host "========================================" -ForegroundColor Cyan
+
+    # The main ruleset's code-scanning rule waits for a CodeQL analysis on every
+    # PR. With no C# the csharp analysis below is skipped and nothing is uploaded,
+    # so the PR stays blocked even though this job passes. Upload an empty CodeQL
+    # result under the same category so the rule sees an analysis with no alerts.
+    - name: Write empty CodeQL SARIF (no C# code)
+      if: matrix.language == 'csharp' && steps.check-csharp.outputs.has-csharp == 'false'
+      shell: pwsh
+      run: |
+        $sarif = @{
+          '$schema' = 'https://json.schemastore.org/sarif-2.1.0.json'
+          version   = '2.1.0'
+          runs      = @(@{
+            tool    = @{ driver = @{ name = 'CodeQL'; rules = @() } }
+            results = @()
+          })
+        }
+        $sarif | ConvertTo-Json -Depth 10 | Set-Content -Path "$env:RUNNER_TEMP/codeql-empty.sarif" -Encoding utf8
+
+    - name: Upload empty CodeQL SARIF (no C# code)
+      if: matrix.language == 'csharp' && steps.check-csharp.outputs.has-csharp == 'false'
+      uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+      with:
+        sarif_file: ${{ runner.temp }}/codeql-empty.sarif
+        category: "/language:${{matrix.language}}"
+
+    - name: Initialize CodeQL
+      if: matrix.language == 'actions' || steps.check-csharp.outputs.has-csharp == 'true'
+      uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+      with:
+        languages: ${{ matrix.language }}
+        # security-extended adds the broader security query pack on top of the
+        # default queries (more rules, slightly longer scans).
+        queries: security-extended
+
+    - name: Setup .NET
+      if: matrix.language == 'csharp' && steps.check-csharp.outputs.has-csharp == 'true'
+      uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore .NET workloads
+      if: matrix.language == 'csharp' && steps.check-csharp.outputs.has-csharp == 'true'
+      shell: pwsh
+      run: |
+        # Skip entirely if no csproj declares a workload-bearing TFM (android/ios/
+        # maccatalyst/maui/tvos/tizen/browser) — netX.Y-windows TFMs use
+        # SDK-bundled projection assemblies, not the workload installer, so
+        # they're intentionally excluded. Saves ~5-15s on pure-library
+        # repos and removes a network-dependent failure mode.
+        $hasWorkloadTfm = @(Get-ChildItem -Recurse -Filter *.csproj |
+                           Select-String -Pattern 'net\d+\.\d+-(android|ios|maccatalyst|maui|tvos|tizen|browser)' -List).Count -gt 0
+        if (-not $hasWorkloadTfm) {
+          Write-Host "No workload-bearing TFMs — skipping dotnet workload restore"
+          exit 0
+        }
+        $solution = Get-ChildItem -Path . -Recurse -Depth 2 -Include "*.sln", "*.slnx" | Select-Object -First 1
+        if ($solution) {
+          Write-Host "Restoring workloads for $($solution.FullName)"
+          dotnet workload restore "$($solution.FullName)"
+        } else {
+          Write-Host "No solution found; restoring workloads for all projects"
+          dotnet workload restore
+        }
+        if ($LASTEXITCODE -ne 0) {
+          Write-Error "dotnet workload restore failed with exit code $LASTEXITCODE"
+          exit $LASTEXITCODE
+        }
+
+    - name: Build for CodeQL Analysis
+      id: build
+      if: matrix.language == 'csharp' && steps.check-csharp.outputs.has-csharp == 'true'
+      shell: pwsh
+      run: |
+        Write-Host "Building solution for CodeQL analysis..."
+        
+        # Find solution file (.sln or .slnx)
+        $solution = Get-ChildItem -Path . -Recurse -Depth 2 -Include "*.sln", "*.slnx" | Select-Object -First 1
+        
+        if ($solution) {
+          Write-Host "Found solution: $($solution.FullName)"
+          dotnet restore $solution.FullName
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "dotnet restore failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+          dotnet build $solution.FullName --configuration Release --no-restore
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "dotnet build failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+        } else {
+          Write-Host "No solution file found, building all projects..."
+          dotnet restore
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "dotnet restore failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+          dotnet build --configuration Release --no-restore
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "dotnet build failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+        }
+        
+        Write-Host "✅ Build completed for CodeQL analysis"
+
+    - name: Perform CodeQL Analysis
+      id: perform-codeql-analysis
+      if: matrix.language == 'actions' || steps.check-csharp.outputs.has-csharp == 'true'
+      uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+      with:
+        category: "/language:${{matrix.language}}"
+
+    - name: Complete Security Scan
+      if: always()
+      shell: pwsh
+      # Step outcomes/outputs arrive through env rather than template expansion so nothing
+      # attacker-influenced is ever spliced into the script (zizmor template-injection).
+      env:
+        MATRIX_LANGUAGE: ${{ matrix.language }}
+        CHECK_CSHARP_OUTCOME: ${{ steps.check-csharp.outcome }}
+        HAS_CSHARP: ${{ steps.check-csharp.outputs.has-csharp }}
+        BUILD_OUTCOME: ${{ steps.build.outcome }}
+        CODEQL_OUTCOME: ${{ steps.perform-codeql-analysis.outcome }}
+      run: |
+        Write-Host "=== CodeQL Security Scan Complete ($env:MATRIX_LANGUAGE) ===" -ForegroundColor Cyan
+
+        # Check the outcome of previous steps
+        $language = "$env:MATRIX_LANGUAGE"
+        $checkCsharpOutcome = "$env:CHECK_CSHARP_OUTCOME"
+        $hasCsharp = "$env:HAS_CSHARP"
+        $buildOutcome = "$env:BUILD_OUTCOME"
+        $codeqlOutcome = "$env:CODEQL_OUTCOME"
+
+        # Determine overall status
+        $hasFailure = $false
+        $failureMessages = @()
+
+        # Check if check-csharp step failed (csharp leg only)
+        if ($checkCsharpOutcome -eq "failure") {
+          $hasFailure = $true
+          $failureMessages += "❌ C# source code detection failed"
+        }
+
+        # Check if build step failed (only relevant if C# code exists)
+        if ($hasCsharp -eq "true" -and $buildOutcome -eq "failure") {
+          $hasFailure = $true
+          $failureMessages += "❌ Build failed during CodeQL analysis"
+        }
+
+        # Check if CodeQL analysis step failed (either language leg)
+        if ($codeqlOutcome -eq "failure") {
+          $hasFailure = $true
+          $failureMessages += "❌ CodeQL analysis failed ($language)"
+        }
+
+        # Display results based on actual step outcomes
+        if ($hasFailure) {
+          Write-Host "❌ Security scan completed with errors:" -ForegroundColor Red
+          foreach ($msg in $failureMessages) {
+            Write-Host "   $msg" -ForegroundColor Red
+          }
+          exit 1
+        } elseif ($codeqlOutcome -eq "success") {
+          Write-Host "✅ CodeQL analysis completed successfully ($language)." -ForegroundColor Green
+          Write-Host "   Results have been uploaded to GitHub Security." -ForegroundColor Green
+        } elseif ($hasCsharp -eq "false") {
+          Write-Host "✅ Security scan completed successfully (no C# code to analyze)." -ForegroundColor Green
+          Write-Host "   This job ran successfully and reports a passing status to branch protection." -ForegroundColor Green
+        } else {
+          Write-Host "✅ Security scan job completed ($language)." -ForegroundColor Green
+          Write-Host "   Job status reported to branch protection." -ForegroundColor Green
+        }
+        Write-Host "========================================" -ForegroundColor Cyan

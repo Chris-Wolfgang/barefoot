@@ -1,0 +1,120 @@
+#!/usr/bin/env pwsh
+<#
+.SYNOPSIS
+    Formats all C# code in the repository using dotnet format.
+
+.DESCRIPTION
+    This script runs 'dotnet format' on the solution to ensure consistent code formatting.
+    Run this before committing; the PR workflow does not run a formatting check, so this is the only gate.
+
+.PARAMETER Check
+    If specified, only checks formatting without making changes.
+
+.EXAMPLE
+    .\scripts\format.ps1
+    Formats all code in the repository (invoke from repo root).
+
+.EXAMPLE
+    .\scripts\format.ps1 -Check
+    Checks formatting without making changes.
+
+.NOTES
+    The script resolves the solution from the repo root regardless of
+    the caller's current directory, so invoking it from any working
+    directory inside the repo works.
+#>
+
+param(
+    [switch]$Check
+)
+
+$ErrorActionPreference = "Stop"
+
+# Pin cwd to the repo root so the solution lookup below works regardless
+# of where the caller invokes the script from (repo root, scripts/, etc).
+$repoRoot = (Resolve-Path -Path (Join-Path $PSScriptRoot '..')).Path
+Push-Location $repoRoot
+try {
+
+Write-Host "🎨 Code Formatting Script" -ForegroundColor Cyan
+Write-Host ""
+
+# Verify dotnet format is available (built into .NET 6+ SDK)
+Write-Host "🔍 Checking for dotnet format..." -ForegroundColor Yellow
+dotnet format --version | Out-Null
+
+if ($LASTEXITCODE -ne 0)
+{
+    Write-Host ""
+    Write-Host "❌ dotnet format is not available!" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "The 'dotnet format' command is built into the .NET SDK starting with .NET 6." -ForegroundColor Yellow
+    Write-Host "You need an SDK new enough to load this repo's target frameworks — see" -ForegroundColor Yellow
+    Write-Host ".github/workflows/pr.yaml (and global.json if present) for the SDK" -ForegroundColor Yellow
+    Write-Host "versions CI uses. The latest stable .NET SDK is generally a safe choice." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Install the .NET SDK from:" -ForegroundColor Yellow
+    Write-Host "https://dotnet.microsoft.com/download" -ForegroundColor Cyan
+    Write-Host ""
+    exit 1
+}
+
+Write-Host "✅ dotnet format is available" -ForegroundColor Green
+Write-Host ""
+
+# Find solution file
+$solution = Get-ChildItem -Path . -File | Where-Object { $_.Extension -eq '.sln' -or $_.Extension -eq '.slnx' } | Select-Object -First 1
+
+if (-not $solution)
+{
+    Write-Host "❌ No solution file found!" -ForegroundColor Red
+    exit 1
+}
+
+$solutionFile = $solution.FullName
+Write-Host "📁 Found solution: $($solution.Name)" -ForegroundColor Green
+Write-Host ""
+
+if ($Check)
+{
+    Write-Host "🔍 Checking code formatting (read-only mode)..." -ForegroundColor Yellow
+    Write-Host ""
+    
+    dotnet format $solutionFile --verify-no-changes --verbosity diagnostic
+    
+    if ($LASTEXITCODE -eq 0)
+    {
+        Write-Host ""
+        Write-Host "✅ All files are properly formatted!" -ForegroundColor Green
+    }
+    else
+    {
+        Write-Host ""
+        Write-Host "❌ Formatting issues detected!" -ForegroundColor Red
+        Write-Host "Run '.\scripts\format.ps1' (without -Check) to fix them automatically." -ForegroundColor Yellow
+        exit 1
+    }
+}
+else
+{
+    Write-Host "✏️  Formatting code..." -ForegroundColor Yellow
+    Write-Host ""
+    
+    dotnet format $solutionFile --verbosity diagnostic
+    
+    if ($LASTEXITCODE -eq 0)
+    {
+        Write-Host ""
+        Write-Host "✅ Code formatting complete!" -ForegroundColor Green
+        Write-Host "Review changes and commit them." -ForegroundColor Cyan
+    }
+    else
+    {
+        Write-Host ""
+        Write-Host "❌ Formatting failed!" -ForegroundColor Red
+        exit 1
+    }
+}
+} finally {
+    Pop-Location
+}

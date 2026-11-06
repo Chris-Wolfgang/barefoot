@@ -1,0 +1,87 @@
+name: SAST (Semgrep)
+
+# Security-grade static analysis beyond CodeQL (#164).
+#
+# Semgrep runs a different engine and ruleset from CodeQL (pattern/dataflow
+# rules for C#, a general security-audit pack, and a secrets pack), so it
+# surfaces issues CodeQL's queries don't. Findings upload to Code Scanning
+# (Security tab) as an additional signal; report-only for now (`|| true`) so a
+# noisy new ruleset can't block merges — promote to a gate once the baseline is
+# clean.
+#
+# Uses the public Semgrep registry packs, which need no account/login.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: semgrep-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  semgrep:
+    name: Semgrep
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          # Not '3.x': on Python 3.15 semgrep-core crashes at startup (it derives an
+          # unbounded stack limit). Move back to '3.x' once semgrep handles 3.15.
+          python-version: '3.14'
+
+      - name: Install Semgrep
+        # Hash-pinned rather than a bare `pip install semgrep` (OSSF Scorecard
+        # Pinned-Dependencies: "pipCommand not pinned by hash"). --require-hashes
+        # makes pip verify every wheel it downloads and refuse anything not
+        # listed, so the transitive tree is pinned too. Regenerate with the uv
+        # command recorded in the header of the requirements file; the resolution
+        # is universal, so it covers every runner platform and Python version.
+        # --no-deps: the file already lists the complete hash-pinned tree, so pip
+        # has nothing to resolve.
+        run: pip install --no-deps --require-hashes -r .github/requirements/semgrep.txt
+
+      - name: Run Semgrep
+        # --error makes findings exit 1; they are reported through the SARIF upload, so
+        # 0 and 1 both continue. Anything else (bad config, crash, network) fails the job
+        # instead of silently uploading nothing.
+        run: |
+          set +e
+          semgrep scan \
+            --config p/csharp \
+            --config p/security-audit \
+            --config p/secrets \
+            --sarif --output semgrep.sarif \
+            --error
+          rc=$?
+          set -e
+          case "$rc" in
+            0) echo "semgrep: no findings" ;;
+            1) echo "semgrep: findings reported (see the Security tab after upload)" ;;
+            *) echo "::error::semgrep failed with exit code $rc (not a findings result)"; exit "$rc" ;;
+          esac
+
+      - name: Upload Semgrep SARIF
+        # A fork's pull_request token cannot write Code Scanning (security-events: write is
+        # not granted), so the upload would fail after a successful scan. Skip it there; the
+        # scan step above still runs (report-only, as documented) and its SARIF is available
+        # once the change lands in this repository.
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
+        with:
+          sarif_file: semgrep.sarif

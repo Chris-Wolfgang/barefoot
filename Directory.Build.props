@@ -1,0 +1,148 @@
+<Project>
+  <PropertyGroup>
+    <!-- latestMajor: the newest GA major language version the installed SDK
+         supports, never a preview. `latest` would also pick up preview
+         features when a preview SDK is on the machine, so the same source
+         could compile on one box and fail on the next. -->
+    <LangVersion>latestMajor</LangVersion>
+
+    <!-- Enable nullable reference types for every SDK-style C# project.
+         The condition excludes:
+           - F# (.fsproj) and VB (.vbproj) — by the .csproj check
+           - Legacy non-SDK csproj (no Microsoft.NET.Sdk import) — by the
+             $(UsingMicrosoftNETSdk) check
+         SDK-style C# projects that need to opt out can set
+         <Nullable>disable</Nullable> in their own csproj. -->
+    <Nullable Condition="'$(MSBuildProjectExtension)' == '.csproj' and '$(UsingMicrosoftNETSdk)' == 'true'">enable</Nullable>
+
+    <!-- Enable .NET analyzers -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    
+    <!-- Suppress warning about NetAnalyzers package since we're using SDK built-in -->
+    <_SkipUpgradeNetAnalyzersNuGetWarning>true</_SkipUpgradeNetAnalyzersNuGetWarning>
+    
+    <!-- Treat warnings as errors in Release builds -->
+    <TreatWarningsAsErrors Condition="'$(Configuration)' == 'Release'">true</TreatWarningsAsErrors>
+
+    <!-- XML documentation for every library under src/ (fleet initiative D3).
+         With TreatWarningsAsErrors above, a public member without a doc
+         comment (CS1591) fails the Release build - that is the point. Scoped
+         to src/ so test, example and benchmark projects are untouched, and
+         only applied when the project has not set the property itself, so a
+         project can still opt out (an analyzer or a generator host) with
+         <GenerateDocumentationFile>false</GenerateDocumentationFile>.
+         The directory test is on the normalized relative path with a trailing
+         slash ("src/Lib/"), so a sibling such as "src-old/" or "src2/" does
+         not match. -->
+    <_RelativeProjectDir>$([MSBuild]::EnsureTrailingSlash($([MSBuild]::MakeRelative($(MSBuildThisFileDirectory), $(MSBuildProjectDirectory)))).Replace('\', '/'))</_RelativeProjectDir>
+    <GenerateDocumentationFile Condition="'$(GenerateDocumentationFile)' == '' and $(_RelativeProjectDir.StartsWith('src/'))">true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include BannedSymbols.txt as AdditionalFiles for BannedApiAnalyzers -->
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)BannedSymbols.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Roslynator - Code quality and refactoring -->
+    <PackageReference Include="Roslynator.Analyzers" Version="5.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    
+    <!-- AsyncFixer - Async/await best practices -->
+    <PackageReference Include="AsyncFixer" Version="2.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    
+    <!-- Microsoft Threading Analyzers - Thread safety -->
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="18.7.23">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    
+    <!-- BannedApiAnalyzers - Prevent usage of specific APIs -->
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="5.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    
+    <!-- Meziantou - Comprehensive code quality -->
+    <PackageReference Include="Meziantou.Analyzer" Version="3.0.270">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+
+    <!-- SonarAnalyzer - Industry-standard analysis -->
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.34.0.3385">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- A1: PublicApiAnalyzers — track public API surface for breaking-change
+         detection. AdditionalFiles below are opt-in PER PROJECT via Exists():
+         drop PublicAPI.Shipped.txt + PublicAPI.Unshipped.txt into a src
+         project directory and the analyzer activates for that project only.
+         Library projects under src/ should opt in; test / example /
+         benchmark projects should not. Per-repo enablement is tracked as a
+         follow-up maintenance issue. -->
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" Condition="Exists('PublicAPI.Shipped.txt') or Exists('PublicAPI.Unshipped.txt')">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" Condition="Exists('PublicAPI.Shipped.txt')" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" Condition="Exists('PublicAPI.Unshipped.txt')" />
+  </ItemGroup>
+
+
+  <PropertyGroup>
+    <!-- CI3: NuGet package metadata canonical defaults. Per-repo fields
+         (Description, PackageTags, PackageProjectUrl, RepositoryUrl,
+         PackageLicenseExpression, PackageReadmeFile) stay in each src
+         csproj where they are repo-specific. -->
+    <!-- Owner-specific by design: this file is synced fleet-wide as-is, so
+         it carries the owner's name rather than a setup.ps1 placeholder.
+         Change these three lines when forking the template for another owner. -->
+    <Authors>Chris Wolfgang</Authors>
+    <Company>Chris Wolfgang</Company>
+    <!-- A literal year, never $([System.DateTime]::UtcNow.Year): that puts the BUILD year in
+         AssemblyCopyrightAttribute, so a rebuild after 1 January no longer matches the
+         released binary - which reproducible-build.yaml exists to prevent. Keep it in step
+         with LICENSE. -->
+    <Copyright>Copyright (c) 2026 Chris Wolfgang</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$(_RelativeProjectDir.StartsWith('src/')) and Exists('$(MSBuildProjectDirectory)/obj/THIRD-PARTY-NOTICES.md')">
+    <!-- Third-party attribution: scripts/third-party-notices.ps1 renders the
+         package's transitive NuGet closure to obj/THIRD-PARTY-NOTICES.md
+         (release.yaml runs it between restore and pack) and it ships at the
+         package root. Generated, never committed - nothing to keep in sync. -->
+    <None Include="$(MSBuildProjectDirectory)/obj/THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- SourceLink: embed source provenance into PDBs so debuggers can step
+         into NuGet package code from GitHub. Dependabot does not bump this
+         file, so check https://www.nuget.org/packages/Microsoft.SourceLink.GitHub
+         when a NuGetAudit advisory names Microsoft.Build.Tasks.Git
+         (CVE-2026-62900 covered 8.0.0 and 10.0.300-10.0.301). -->
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.401">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

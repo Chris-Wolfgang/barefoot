@@ -1,0 +1,64 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "src/**/*.csproj"
+          ],
+          "src": "../"
+        }
+      ],
+      "dest": "api",
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "exclude": [
+          "_site/**",
+          "api/README.md"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "logo.svg",
+          "favicon.svg",
+          "favicon.ico",
+          "apple-touch-icon.png",
+          "images/**",
+          "public/**",
+          "versions.json"
+        ]
+      }
+    ],
+
+    "output": "_site",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "{{PROJECT_NAME}}",
+      "_appTitle": "{{PROJECT_NAME}} Documentation",
+      "_appLogoPath": "logo.svg",
+      "_appFaviconPath": "favicon.svg",
+      "_enableSearch": true,
+      "_appFooter": "Made with DocFX <script>(function(){var r='/';if(window.location.hostname.endsWith('.github.io')){var s=window.location.pathname.split('/').filter(Boolean);if(s.length)r='/'+s[0]+'/';}var t=document.createElement('script');t.src=r+'public/version-picker.js';t.async=true;document.head.appendChild(t);})();</script>",
+      "_disableSidebar": false,
+      "_disableTocFilter": false,
+      "_enableDarkMode": true,
+      "colorMode": "dark",
+      "_baseUrl": "{{DOCS_URL}}versions/latest/",
+      "pdf": true
+    }
+  }
+}
