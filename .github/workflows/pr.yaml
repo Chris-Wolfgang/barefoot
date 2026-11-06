@@ -43,6 +43,9 @@ on:
   pull_request:
     branches:
       - main
+      # Feature work is integrated on develop and reaches main by release; PRs
+      # into it get the same checks as PRs into main.
+      - develop
   # A push to main re-runs the same gates on the merged result and keeps the InspectCode
   # alert set on main current (a pull_request run attributes its SARIF to the PR ref).
   push:

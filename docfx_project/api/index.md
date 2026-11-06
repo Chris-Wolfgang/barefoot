@@ -1,6 +1,6 @@
 # API Reference
 
-Welcome to the {{PROJECT_NAME}} API documentation.
+Welcome to the Wolfgang.Barefoot API documentation.
 
 This section contains the complete API reference, automatically generated from XML documentation comments in the source code.
 

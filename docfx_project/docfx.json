@@ -47,8 +47,8 @@
       "modern"
     ],
     "globalMetadata": {
-      "_appName": "{{PROJECT_NAME}}",
-      "_appTitle": "{{PROJECT_NAME}} Documentation",
+      "_appName": "Wolfgang.Barefoot",
+      "_appTitle": "Wolfgang.Barefoot Documentation",
       "_appLogoPath": "logo.svg",
       "_appFaviconPath": "favicon.svg",
       "_enableSearch": true,
@@ -57,7 +57,7 @@
       "_disableTocFilter": false,
       "_enableDarkMode": true,
       "colorMode": "dark",
-      "_baseUrl": "{{DOCS_URL}}versions/latest/",
+      "_baseUrl": "https://Chris-Wolfgang.github.io/barefoot/versions/latest/",
       "pdf": true
     }
   }
