@@ -255,11 +255,11 @@
   .checks{columns:2;column-gap:14px;font-size:13px} .checks label{display:flex;gap:7px;align-items:center;padding:3px 0;break-inside:avoid}
   .checks label.dim{color:var(--ink-3);align-items:flex-start} .checks label.dim input{margin-top:3px}
   .checks .lbl{display:flex;flex-direction:column;line-height:1.25} .checks .lbl small{font-size:11px;color:var(--ink-3)}
-  [data-screen="editor"].on{padding-bottom:70px}
-  .fanout{position:sticky;bottom:0;margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 -2px 8px rgba(16,24,40,.08);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px}
+  .fanout{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px}
   .fanout .calc b{font-size:15px} .fanout .calc span{color:var(--ink-3)} .fanout .sp{flex:1}
   .fanout .acts{display:flex;gap:8px;margin-left:auto;white-space:nowrap}
   .fanout .warn{color:var(--warn);font-weight:600}
+  :root[data-device="phone"] .fanout{padding:8px 12px;gap:4px 10px;font-size:12.5px} :root[data-device="phone"] .fanout .calc b{font-size:13.5px} :root[data-device="phone"] .fanout .acts{width:100%;justify-content:flex-end;margin-top:4px}
   .recip{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px} .recip:last-child{border-bottom:0}
   .recip .who{flex:1} .recip .meta{color:var(--ink-3);font-size:12px}
   .danger{color:var(--bad)}
