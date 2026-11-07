@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-role="editor" data-device="laptop">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barefoot Vacation for Sandals &amp; Beaches resorts — v2 UI mockup</title>
+<style>
+  /* ---- Fluent-flavoured neutral tokens; one accent ---- */
+  :root{
+    --accent:#05b2e8; --accent-fg:#0b2a3a; --accent-soft:#e2f5fc; --accent-dk:#0a8fbd;
+    --bg:#f3f4f6; --surface:#ffffff; --surface-2:#f8f9fb; --line:#e3e6ea; --line-2:#d2d7dd;
+    --ink:#1b1f24; --ink-2:#4b5563; --ink-3:#6b7280; --rail:#ffffff; --rail-ink:#1b1f24; --rail-active:#e2f5fc;
+    --ok:#1f7a3a; --ok-soft:#e4f5ea; --warn:#9a5b00; --warn-soft:#fff3d6; --bad:#b4232c; --bad-soft:#fde8ea;
+    --down:#1f7a3a; --up:#b4232c; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+    --r:8px; --rail-w:220px; --rail-wc:60px;
+  }
+  :root[data-theme="dark"]{
+    --accent:#2cc3f0; --accent-fg:#06202d; --accent-soft:#0f3542; --accent-dk:#7fdcf7;
+    --bg:#111418; --surface:#1a1f26; --surface-2:#20262e; --line:#2a313a; --line-2:#364049;
+    --ink:#e6e9ee; --ink-2:#b4bcc8; --ink-3:#8a94a3; --rail:#141920; --rail-ink:#e6e9ee; --rail-active:#0f3542;
+    --ok:#4cc76f; --ok-soft:#153522; --warn:#f0b64a; --warn-soft:#3a2d12; --bad:#ff6b73; --bad-soft:#3c1a1e;
+    --down:#4cc76f; --up:#ff6b73; --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font:14px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg)}
+  a{color:var(--accent-dk);text-decoration:none} a:hover{text-decoration:underline}
+  button{font:inherit}
+
+  /* ---- mockup chrome (not part of the app) ---- */
+  .mock-bar{position:fixed;top:0;left:0;right:0;height:36px;background:#0b2a3a;color:#cfe9f3;display:flex;gap:10px;align-items:center;padding:0 12px;font-size:12px;z-index:50}
+  .mock-bar b{color:#fff;margin-right:6px}
+  .mock-bar button{background:#123a4e;color:#cfe9f3;border:1px solid #1e5d7a;border-radius:6px;padding:3px 10px;cursor:pointer}
+  .mock-bar button[aria-pressed="true"]{background:var(--accent);color:#06202d;border-color:transparent}
+  .mock-bar .sp{flex:1}
+  .mock-bar .note{opacity:.75}
+  .stage{padding-top:36px;height:100%;display:flex;justify-content:center;background:#0b0f14 }
+  :root[data-device="laptop"] .stage{background:var(--bg)}
+  .device{width:100%;height:calc(100vh - 36px);overflow:hidden;background:var(--bg)}
+  :root[data-device="phone"] .device{width:390px;height:calc(100vh - 56px);margin-top:10px;border-radius:28px;border:8px solid #22272e;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+
+  /* ---- app shell ---- */
+  .app{display:grid;grid-template-columns:var(--rail-w) 1fr;height:100%;transition:grid-template-columns .15s}
+  .app.collapsed{grid-template-columns:var(--rail-wc) 1fr}
+  .rail{background:var(--rail);color:var(--rail-ink);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+  .brand{display:flex;align-items:center;gap:10px;padding:14px 14px 10px;min-height:56px}
+  .logo{width:30px;height:30px;border-radius:8px;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-weight:700;flex:none}
+  .brand .name{font-weight:600;white-space:nowrap}
+  .brand .env{font-size:11px;color:var(--ink-3);white-space:nowrap}
+  .collapsed .brand .name,.collapsed .brand .env,.collapsed .nav span,.collapsed .sect,.collapsed .me .who{display:none}
+  .nav{display:flex;flex-direction:column;gap:2px;padding:6px 8px}
+  .nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;color:var(--rail-ink);white-space:nowrap}
+  .nav a:hover{background:var(--surface-2);text-decoration:none}
+  .nav a.active{background:var(--rail-active);color:var(--accent-dk);font-weight:600;position:relative}
+  .nav a.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--accent)}
+  .nav i{width:20px;height:20px;display:inline-grid;place-items:center;flex:none;font-style:normal;font-size:15px}
+  .sect{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);padding:12px 18px 4px}
+  .admin-only,.nav a.admin-only{display:none} :root[data-role="admin"] .admin-only,:root[data-role="admin"] .nav a.admin-only{display:flex}
+  :root[data-role="admin"] .sect.admin-only{display:block}
+  .rail .grow{flex:1}
+  .me{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line)}
+  .avatar{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dk);display:grid;place-items:center;font-weight:600;font-size:12px;flex:none}
+  .me .who{line-height:1.2;white-space:nowrap} .me .who small{color:var(--ink-3)}
+  .collapse-btn{margin:6px 8px 10px;background:none;border:1px solid var(--line);color:var(--ink-2);border-radius:6px;padding:6px;cursor:pointer}
+
+  main{overflow:auto;padding:22px 26px 40px}
+  .page-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+  h1{font-size:22px;font-weight:600;margin:0}
+  .sub{color:var(--ink-3);font-size:13px;margin-top:2px}
+  .btn{border:1px solid var(--line-2);background:var(--surface);color:var(--ink);border-radius:6px;padding:7px 12px;cursor:pointer}
+  .btn.primary{background:var(--accent);border-color:transparent;color:var(--accent-fg);font-weight:600}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--accent-dk)}
+
+  /* status strip */
+  .strip{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 14px;box-shadow:var(--shadow);margin-bottom:14px;font-size:13px}
+  .strip .k{color:var(--ink-3)} .strip b{font-weight:600}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:middle}
+
+  .attn{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);border-radius:var(--r);padding:10px 14px;margin-bottom:14px}
+  .attn .ic{color:var(--warn);font-weight:700}
+  .attn ul{margin:2px 0 0;padding-left:18px} .attn li{margin:2px 0}
+
+  .grid{display:grid;grid-template-columns:1fr 300px;gap:14px;align-items:start}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  .card h2{font-size:14px;font-weight:600;margin:0;padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .card h2 a{font-weight:400;font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-weight:600;color:var(--ink-3);font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+  tr.row:hover td{background:var(--surface-2);cursor:pointer}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .name{font-weight:600} .meta{color:var(--ink-3);font-size:12px}
+  .pill{display:inline-block;border:1px solid var(--line-2);border-radius:999px;padding:1px 8px;font-size:11px;margin:1px 2px 1px 0;color:var(--ink-2);background:var(--surface-2)}
+  .pill.off{border-style:dashed;color:var(--warn)}
+  .st{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:600}
+  .st.active{background:var(--ok-soft);color:var(--ok)} .st.draft{background:var(--surface-2);color:var(--ink-3)} .st.inactive{background:var(--bad-soft);color:var(--bad)}
+  .delta{font-weight:600;white-space:nowrap} .delta.down{color:var(--down)} .delta.up{color:var(--up)} .delta.flat{color:var(--ink-3)}
+  .price{font-weight:600;font-variant-numeric:tabular-nums}
+
+  .movers{list-style:none;margin:0;padding:4px 0}
+  .movers li{display:flex;justify-content:space-between;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line)}
+  .movers li:last-child{border-bottom:0}
+  .movers .what{line-height:1.25} .movers .what small{display:block;color:var(--ink-3)}
+  .digest{padding:12px 14px;font-size:13px}
+  .digest .sum{display:flex;gap:14px;margin:8px 0 10px}
+  .digest .sum div{flex:1;background:var(--surface-2);border-radius:6px;padding:8px 10px}
+  .digest .sum b{display:block;font-size:16px}
+  .empty{padding:36px 20px;text-align:center;color:var(--ink-3)}
+
+  .st.running{background:var(--accent-soft);color:var(--accent-dk)} .st.queued{background:var(--surface-2);color:var(--ink-3)}
+  .st.partial{background:var(--warn-soft);color:var(--warn)} .st.failed{background:var(--bad-soft);color:var(--bad)} .st.skipped{background:var(--surface-2);color:var(--ink-3);text-decoration:line-through}
+  .prog{height:6px;width:110px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-bottom:3px} .prog i{display:block;height:100%;background:var(--accent)}
+  .prog.ok i{background:var(--ok)} .prog.warn i{background:var(--warn)} .prog.bad i{background:var(--bad)}
+  :root[data-device="phone"] table.rr thead{display:none}
+  :root[data-device="phone"] table.rr tr{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  :root[data-device="phone"] table.rr td{border:0;padding:0}
+  :root[data-device="phone"] table.rr td.first{grid-column:1/-1}
+  :root[data-device="phone"] table.rr td.num{text-align:right}
+
+  /* narrow laptop / split pane: stack the side column under the main card instead of squeezing the table */
+  @media (max-width: 1180px){ .grid{grid-template-columns:1fr} .movers-card{display:none} }
+  table.rr td,table.rr th{white-space:nowrap} table.rr td.first .name{white-space:normal}
+
+  /* bottom tab bar (phone) */
+  .tabbar{display:none}
+  :root[data-device="phone"] .app{grid-template-columns:1fr;grid-template-rows:1fr 58px}
+  :root[data-device="phone"] .rail{display:none}
+  :root[data-device="phone"] .tabbar{display:flex;justify-content:space-around;align-items:center;border-top:1px solid var(--line);background:var(--rail);padding:4px 0 8px}
+  :root[data-device="phone"] .tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--ink-3);padding:4px 8px}
+  :root[data-device="phone"] .tabbar a.active{color:var(--accent-dk);font-weight:600}
+  :root[data-device="phone"] main{padding:14px 14px 20px}
+  :root[data-device="phone"] .grid{grid-template-columns:1fr}
+  :root[data-device="phone"] .strip{gap:6px 16px}
+  :root[data-device="phone"] .page-h .btn.primary{padding:6px 10px}
+  /* phone: matrices become cards */
+  :root[data-device="phone"] table.mx thead{display:none}
+  :root[data-device="phone"] table.mx tr{display:block;padding:10px 12px;border-bottom:1px solid var(--line)}
+  :root[data-device="phone"] table.mx td{display:inline-block;border:0;padding:1px 4px 1px 0}
+  :root[data-device="phone"] table.mx td.hide-ph{display:none}
+  :root[data-device="phone"] table.mx td.first{display:block;padding-bottom:4px}
+  :root[data-device="phone"] table.mx td.num{float:right;padding-left:8px}
+  :root[data-device="phone"] .movers-card{display:none}
+
+  /* open issues (dashboard) */
+  .issues h2{align-items:center}
+  .ilist{list-style:none;margin:0;padding:0}
+  .ilist li{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .ilist li:last-child{border-bottom:0}
+  .ilist .sev{width:8px;height:8px;border-radius:50%;margin-top:7px;flex:none;background:var(--warn)} .ilist li.bad .sev{background:var(--bad)}
+  .ilist .ibody{flex:1} .ilist .ititle{font-weight:600} .ilist .itext{font-size:13px;color:var(--ink-2)} .ilist .iwhen{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+  .ilist .istate{font-size:11px;border-radius:999px;padding:2px 8px;background:var(--surface-2);color:var(--ink-3);white-space:nowrap;margin-top:4px}
+  .ilist li.new .istate{background:var(--accent-soft);color:var(--accent-dk);font-weight:600}
+  .ilist .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px} .ilist .acts .btn{padding:4px 9px;font-size:12px}
+  :root[data-device="phone"] .ilist li{flex-wrap:wrap} :root[data-device="phone"] .ilist .istate{order:3}
+
+  /* notices */
+  .notices-bar{display:flex;align-items:center;gap:10px;background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);border-radius:var(--r);padding:8px 12px;margin-bottom:14px;font-size:13px}
+  .notices-bar.quiet{background:var(--surface);border-color:var(--line);color:var(--ink-3)}
+  .notices-bar .sp{flex:1} .notices-bar .bell{font-size:14px}
+  .modal-back{display:none;position:absolute;inset:0;background:rgba(10,14,20,.45);z-index:20;align-items:center;justify-content:center;padding:20px}
+  .modal-back.open{display:flex}
+  .modal{width:min(640px,100%);max-height:90%;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+  .modal-h{display:flex;gap:12px;align-items:flex-start;padding:16px 18px 10px;border-bottom:1px solid var(--line)}
+  .modal-h h2{margin:0;font-size:17px;font-weight:600}
+  .modal-h .ic{width:28px;height:28px;border-radius:50%;background:var(--warn-soft);color:var(--warn);display:grid;place-items:center;font-weight:700;flex:none}
+  .nlist{list-style:none;margin:0;padding:0}
+  .nlist li{display:flex;gap:12px;align-items:flex-start;padding:12px 18px;border-bottom:1px solid var(--line)}
+  .nlist li.done{opacity:.45} .nlist li.done .btn{visibility:hidden}
+  .nbody{flex:1} .ntitle{font-weight:600} .ntext{font-size:13px;color:var(--ink-2);margin-top:2px} .nwhen{font-size:11.5px;color:var(--ink-3);margin-top:4px}
+  .modal-f{display:flex;align-items:center;gap:8px;padding:12px 18px} .modal-f .sp{flex:1}
+  :root[data-device="phone"] .modal{max-height:100%;border-radius:12px}
+  :root[data-device="phone"] .nlist li{flex-direction:column;align-items:stretch} :root[data-device="phone"] .nlist li .btn{align-self:flex-end}
+
+  .disc{padding:6px 18px 4px;font-size:13.5px;line-height:1.55;color:var(--ink-2)} .disc p{margin:8px 0} .disc b{color:var(--ink)}
+  .disc-ack{display:flex;gap:10px;align-items:center;margin:14px 0 6px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);font-weight:600;color:var(--ink);cursor:pointer}
+  .disc-ack input{width:16px;height:16px}
+  #disclaimerModal{z-index:30}
+
+  /* footer + sign-in */
+  .foot{margin-top:28px;padding-top:12px;border-top:1px solid var(--line);color:var(--ink-3);font-size:11.5px;line-height:1.5;max-width:900px}
+  .signin{display:none;position:absolute;inset:0;background:var(--bg);align-items:center;justify-content:center;padding:20px}
+  :root[data-view="signin"] .signin{display:flex}
+  .device{position:relative}
+  .signin-card{width:min(420px,100%);background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:26px 28px 20px}
+  .brand.big{padding:0 0 14px} .brand.big .logo{width:40px;height:40px;border-radius:10px} .brand.big .name{font-size:20px} .brand.big .env{font-size:13px}
+  .lead{color:var(--ink-2);margin:4px 0 18px}
+  .btn.wide{display:block;width:100%;padding:10px;margin-bottom:8px}
+  .small{font-size:12px;color:var(--ink-3);margin:12px 0 0} .small.legal{font-size:11px;line-height:1.5;border-top:1px solid var(--line);padding-top:10px}
+
+  /* screens */
+  [data-screen]{display:none} [data-screen].on{display:block}
+  /* role gates win over screen switching: a non-admin never renders the System dashboard, an admin never the Editor one */
+  :root:not([data-role="admin"]) .admin-dash{display:none!important}
+  :root[data-role="admin"] .editor-dash{display:none!important}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  .chip{border:1px solid var(--line-2);background:var(--surface);border-radius:999px;padding:4px 11px;font-size:12px;cursor:pointer;color:var(--ink-2)}
+  .chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dk);font-weight:600}
+  .search{border:1px solid var(--line-2);background:var(--surface);border-radius:6px;padding:6px 10px;min-width:220px;color:var(--ink)}
+  .select{border:1px solid var(--line-2);background:var(--surface);border-radius:6px;padding:6px 10px;color:var(--ink)}
+  .toolbar .sp{flex:1}
+  .admin-only-inline{display:none} :root[data-role="admin"] .admin-only-inline{display:inline-flex;gap:8px;align-items:center}
+  :root[data-role="admin"] #nlist li.admin-only-inline{display:flex!important}
+  td.actions{white-space:nowrap;text-align:right} td.actions .btn{padding:4px 9px;font-size:12px;margin-left:4px}
+  .prio{display:inline-block;min-width:26px;text-align:center;border-radius:4px;background:var(--surface-2);font-variant-numeric:tabular-nums;padding:1px 5px}
+  .owner{color:var(--ink-3);font-size:12px}
+  :root[data-device="phone"] table.mx td.actions{display:block;text-align:left;padding-top:6px}
+
+  /* editor */
+  .ed-h{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .ed-h h1{flex:1;min-width:200px}
+  .ed-h .crumbs{width:100%;font-size:12px;color:var(--ink-3)}
+  .panes{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:start}
+  :root[data-device="phone"] .panes{grid-template-columns:1fr}
+  .pane{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+  .pane h2{font-size:14px;font-weight:600;margin:0;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .pane h2 small{font-weight:400;color:var(--ink-3);margin-left:6px}
+  .pane .body{padding:12px 14px 4px}
+  .f{margin-bottom:12px} .f label{display:block;font-size:12px;color:var(--ink-3);margin-bottom:4px}
+  .f input[type=text],.f input[type=number],.f select{border:1px solid var(--line-2);background:var(--surface);color:var(--ink);border-radius:6px;padding:7px 9px;font:inherit}
+  .f input[type=text]{width:100%} .f input[type=number]{width:90px}
+  .frow{display:flex;gap:14px;flex-wrap:wrap} .frow .f{flex:1;min-width:140px}
+  .seg{display:inline-flex;border:1px solid var(--line-2);border-radius:6px;overflow:hidden}
+  .seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer;color:var(--ink-2);font:inherit}
+  .seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-dk);font-weight:600}
+  .hint{font-size:12px;color:var(--ink-3);margin-top:4px}
+  .toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+  .toggle i{width:34px;height:18px;border-radius:9px;background:var(--line-2);position:relative;display:inline-block}
+  .toggle i::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .1s}
+  .toggle input{display:none} .toggle input:checked + i{background:var(--accent)} .toggle input:checked + i::after{left:18px}
+  .island{border:1px solid var(--line);border-radius:6px;margin-bottom:8px}
+  .island summary{cursor:pointer;padding:7px 10px;font-weight:600;font-size:13px;display:flex;justify-content:space-between;list-style:none}
+  .island summary::-webkit-details-marker{display:none}
+  .island summary .gw{font-weight:400;color:var(--ink-3)}
+  .island .opt{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 26px;font-size:13px;border-top:1px solid var(--line)}
+  .island .opt .tag{margin-left:auto;font-size:11px;color:var(--ink-3)}
+  .island .opt.off{color:var(--ink-3)} .island .opt.off .tag{color:var(--warn)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .achip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);background:var(--surface-2);border-radius:999px;padding:3px 6px 3px 10px;font-size:12px}
+  .achip b{font-weight:600} .achip small{color:var(--ink-3)} .achip button{border:0;background:none;color:var(--ink-3);cursor:pointer;font-size:13px;padding:0 4px}
+  .typeahead{position:relative} .typeahead .dd{position:absolute;left:0;right:0;top:100%;background:var(--surface);border:1px solid var(--line-2);border-radius:6px;box-shadow:var(--shadow);z-index:5;font-size:13px}
+  .typeahead .dd div{padding:6px 10px} .typeahead .dd div:hover,.typeahead .dd div.sel{background:var(--accent-soft)}
+  .checks{columns:2;column-gap:14px;font-size:13px} .checks label{display:flex;gap:7px;align-items:center;padding:3px 0;break-inside:avoid}
+  .checks label.dim{color:var(--ink-3)}
+  .fanout{position:sticky;bottom:0;margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 -2px 8px rgba(16,24,40,.08);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px}
+  .fanout .calc b{font-size:15px} .fanout .calc span{color:var(--ink-3)} .fanout .sp{flex:1}
+  .fanout .warn{color:var(--warn);font-weight:600}
+  .recip{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px} .recip:last-child{border-bottom:0}
+  .recip .who{flex:1} .recip .meta{color:var(--ink-3);font-size:12px}
+  .danger{color:var(--bad)}
+
+  /* admin dashboard */
+  .admin-dash{display:none} :root[data-role="admin"] .admin-dash{display:block}
+  :root[data-role="admin"] .editor-dash{display:none}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  :root[data-device="phone"] .kpis{grid-template-columns:1fr 1fr}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow)}
+  .kpi .k{font-size:12px;color:var(--ink-3)} .kpi .v{font-size:22px;font-weight:600;margin:2px 0 4px;font-variant-numeric:tabular-nums}
+  .kpi .d{font-size:12px;color:var(--ink-3)}
+  .bar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-top:8px}
+  .bar i{display:block;height:100%;background:var(--accent)} .bar.warn i{background:var(--warn)}
+  .kpi.live .v::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:8px;vertical-align:middle}
+  .kpi.paused .v::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ink-3);margin-right:8px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="mock-bar">
+  <b>Preview</b>
+  <button id="t-light" aria-pressed="true" onclick="setTheme('light')">Light</button>
+  <button id="t-dark" aria-pressed="false" onclick="setTheme('dark')">Dark</button>
+  <span style="width:10px"></span>
+  <button id="r-editor" aria-pressed="true" onclick="setRole('editor')">Editor</button>
+  <button id="r-admin" aria-pressed="false" onclick="setRole('admin')">Admin</button>
+  <span style="width:10px"></span>
+  <button id="d-laptop" aria-pressed="true" onclick="setDevice('laptop')">Laptop</button>
+  <button id="d-phone" aria-pressed="false" onclick="setDevice('phone')">Phone</button>
+  <span style="width:10px"></span>
+  <button id="v-app" aria-pressed="true" onclick="setView('app')">App</button>
+  <button id="v-signin" aria-pressed="false" onclick="setView('signin')">Sign-in page</button>
+  <span style="width:10px"></span>
+  <button onclick="firstLogin()">Replay first sign-in</button>
+  <button onclick="resetNotices()">Re-show notices</button>
+  <span class="sp"></span>
+  <span class="note" id="note">Dashboard · click the rail's ⟨ to collapse · Searches → Edit opens the editor</span>
+</div>
+
+<div class="stage"><div class="device"><div class="app" id="app">
+  <!-- ---------- rail ---------- -->
+  <nav class="rail" aria-label="Main">
+    <div class="brand"><div class="logo" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="currentColor" opacity=".55"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="currentColor" opacity=".55"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="currentColor"/></svg></div><div><div class="name">Barefoot Vacation</div><div class="env">for Sandals &amp; Beaches resorts</div></div></div>
+    <div class="nav">
+      <a class="active" href="#" data-go="dashboard"><i>▦</i><span>Dashboard</span></a>
+      <a href="#" data-go="matrices"><i>▤</i><span>Searches</span></a>
+      <a href="#"><i>≡</i><span>Results</span></a>
+      <a href="#"><i>↗</i><span>Price history</span></a>
+      <a href="#"><i>✉</i><span>My digests</span></a>
+      <a href="#"><i>☺</i><span>Profile</span></a>
+    </div>
+    <div class="sect admin-only">Admin</div>
+    <div class="nav">
+      <a class="admin-only" href="#"><i>⟳</i><span>Runs</span></a>
+      <a class="admin-only" href="#"><i>✈</i><span>Deliveries</span></a>
+      <a class="admin-only" href="#"><i>⌂</i><span>Reference data</span></a>
+      <a class="admin-only" href="#"><i>☷</i><span>Users</span></a>
+      <a class="admin-only" href="#"><i>⚙</i><span>System</span></a>
+    </div>
+    <div class="grow"></div>
+    <div class="me"><div class="avatar">AS</div><div class="who">Alice Smith<br><small>Editor · Sign out</small></div></div>
+    <button class="collapse-btn" onclick="document.getElementById('app').classList.toggle('collapsed')" title="Collapse">⟨</button>
+  </nav>
+
+  <!-- ---------- main ---------- -->
+  <main>
+    <!-- ===== EDITOR DASHBOARD ===== -->
+    <section class="editor-dash" data-screen="dashboard">
+      <div class="page-h">
+        <div><h1>Dashboard</h1><div class="sub">What changed since your last digest.</div></div>
+        <button class="btn primary">+ New search</button>
+      </div>
+
+      <div class="strip">
+        <span><span class="dot"></span><b>3</b> <span class="k">active searches</span></span>
+        <span><span class="k">Last searched</span> <b>Tue 06:12</b></span>
+        <span><span class="k">Next run</span> <b>Fri 06:00</b></span>
+        <span><span class="k">Last digest to you</span> <b>Tue 06:40</b> · <a href="#">open</a></span>
+      </div>
+
+      <div class="card issues" id="issuesCard">
+        <h2><span>Open issues <span class="meta" id="issuesCount"></span></span><span class="meta">stay here until resolved — acknowledging only stops the pop-up</span></h2>
+        <ul class="ilist" id="ilist"></ul>
+        <div class="empty" id="issuesEmpty" style="display:none">Nothing needs your attention.</div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2>Recent results <span class="meta">last 10 runs of your searches</span> <a href="#" data-go="results">All results →</a></h2>
+          <table class="rr">
+            <thead><tr><th>Search</th><th>Run</th><th>Status</th><th>Lookups</th><th class="num">Cheapest</th><th class="num">vs previous</th><th>Digest</th></tr></thead>
+            <tbody>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Feb–Mar St. Lucia scouting</div><div class="meta">7 nights · 2 adults · flights</div></td>
+                <td><div>Today 06:00</div><div class="meta">in progress</div></td>
+                <td><span class="st running">In progress</span></td>
+                <td><div class="prog"><i style="width:46%"></i></div><div class="meta">27 of 58</div></td>
+                <td class="num"><span class="price">$7,180</span> <span class="meta">so far</span></td>
+                <td class="num"><span class="delta down">▼ $32</span></td>
+                <td><span class="meta">after the run</span></td>
+              </tr>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Jamaica, late April</div><div class="meta">10 nights · 2 adults · flights</div></td>
+                <td><div>Today 06:00</div><div class="meta">queued</div></td>
+                <td><span class="st queued">Queued</span></td>
+                <td><div class="prog"><i style="width:0"></i></div><div class="meta">0 of 32</div></td>
+                <td class="num"><span class="meta">—</span></td>
+                <td class="num"><span class="meta">—</span></td>
+                <td><span class="meta">—</span></td>
+              </tr>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Feb–Mar St. Lucia scouting</div><div class="meta">7 nights · 2 adults · flights</div></td>
+                <td><div>Tue 06:12</div><div class="meta">41 min</div></td>
+                <td><span class="st active">Succeeded</span></td>
+                <td><div class="prog ok"><i style="width:100%"></i></div><div class="meta">58 of 58</div></td>
+                <td class="num"><span class="price">$7,212</span></td>
+                <td class="num"><span class="delta down">▼ $486</span></td>
+                <td><a href="#" data-go="digests">Sent 06:40</a></td>
+              </tr>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Jamaica, late April</div><div class="meta">10 nights · 2 adults · flights</div></td>
+                <td><div>Tue 06:31</div><div class="meta">55 min</div></td>
+                <td><span class="st partial">Partial</span></td>
+                <td><div class="prog warn"><i style="width:94%"></i></div><div class="meta">30 of 32 · 2 failed</div></td>
+                <td class="num"><span class="price">$9,840</span></td>
+                <td class="num"><span class="delta up">▲ $120</span></td>
+                <td><a href="#" data-go="digests">Sent 06:40</a></td>
+              </tr>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Grenada, no flights</div><div class="meta">7 nights · 2 adults</div></td>
+                <td><div>Tue 06:40</div><div class="meta">12 min</div></td>
+                <td><span class="st active">Succeeded</span></td>
+                <td><div class="prog ok"><i style="width:100%"></i></div><div class="meta">30 of 30</div></td>
+                <td class="num"><span class="price">$5,105</span></td>
+                <td class="num"><span class="delta flat">—</span></td>
+                <td><a href="#" data-go="digests">Sent 06:41</a></td>
+              </tr>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Feb–Mar St. Lucia scouting</div><div class="meta">7 nights · 2 adults · flights</div></td>
+                <td><div>Sat 06:10</div><div class="meta">44 min</div></td>
+                <td><span class="st active">Succeeded</span></td>
+                <td><div class="prog ok"><i style="width:100%"></i></div><div class="meta">58 of 58</div></td>
+                <td class="num"><span class="price">$7,698</span></td>
+                <td class="num"><span class="delta up">▲ $60</span></td>
+                <td><a href="#" data-go="digests">Sent 06:52</a></td>
+              </tr>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Jamaica, late April</div><div class="meta">10 nights · 2 adults · flights</div></td>
+                <td><div>Sat 06:54</div><div class="meta">stopped after 9 min</div></td>
+                <td><span class="st failed">Failed</span></td>
+                <td><div class="prog bad"><i style="width:19%"></i></div><div class="meta">6 of 32 · site unavailable</div></td>
+                <td class="num"><span class="meta">—</span></td>
+                <td class="num"><span class="meta">—</span></td>
+                <td><span class="meta">not sent</span></td>
+              </tr>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Grenada, no flights</div><div class="meta">7 nights · 2 adults</div></td>
+                <td><div>Sat 07:03</div><div class="meta">11 min</div></td>
+                <td><span class="st active">Succeeded</span></td>
+                <td><div class="prog ok"><i style="width:100%"></i></div><div class="meta">30 of 30</div></td>
+                <td class="num"><span class="price">$5,105</span></td>
+                <td class="num"><span class="delta flat">—</span></td>
+                <td><a href="#" data-go="digests">Sent 07:10</a></td>
+              </tr>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Anniversary — Antigua</div><div class="meta">7 nights · 2 adults · flights</div></td>
+                <td><div>Sat 06:02</div><div class="meta">—</div></td>
+                <td><span class="st skipped">Skipped</span></td>
+                <td><div class="meta">window passed · search deactivated</div></td>
+                <td class="num"><span class="meta">—</span></td>
+                <td class="num"><span class="meta">—</span></td>
+                <td><span class="meta">—</span></td>
+              </tr>
+              <tr class="row" data-go="results">
+                <td class="first"><div class="name">Feb–Mar St. Lucia scouting</div><div class="meta">7 nights · 2 adults · flights</div></td>
+                <td><div>Oct 29 06:09</div><div class="meta">43 min</div></td>
+                <td><span class="st active">Succeeded</span></td>
+                <td><div class="prog ok"><i style="width:100%"></i></div><div class="meta">58 of 58</div></td>
+                <td class="num"><span class="price">$7,638</span></td>
+                <td class="num"><span class="delta down">▼ $210</span></td>
+                <td><a href="#" data-go="digests">Sent 06:50</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="hint" style="padding:8px 14px 10px">A row is one search on one run. Click it to open that run's results; the status refreshes every 30 s while a run is in progress.</div>
+        </div>
+
+        <div>
+          <div class="card movers-card" style="margin-bottom:14px">
+            <h2>Biggest movers <span class="meta">since Sat</span></h2>
+            <ul class="movers">
+              <li><div class="what">Sandals Grande St. Lucian · Beachfront Butler<small>Feb 22 · 7 nights</small></div><div class="delta down">▼ $486</div></li>
+              <li><div class="what">Sandals Regency La Toc · Ocean View Club<small>Mar 1 · 7 nights</small></div><div class="delta down">▼ $310</div></li>
+              <li><div class="what">Sandals Royal Caribbean · Swim-up Suite<small>Apr 24 · 10 nights</small></div><div class="delta up">▲ $120</div></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2>Latest digest <a href="#">My digests →</a></h2>
+            <div class="digest">
+              <div><b>Feb–Mar St. Lucia scouting</b> <span class="meta">· Tue 06:40</span></div>
+              <div class="sum"><div><b>38</b><span class="meta">rooms match</span></div><div><b>$7,212</b><span class="meta">cheapest</span></div><div><b>2</b><span class="meta">resorts</span></div></div>
+              <a href="#">Open digest</a> · <a href="#">Results</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ADMIN DASHBOARD ===== -->
+    <section class="admin-dash" data-screen="dashboard">
+      <div class="page-h">
+        <div><h1>System</h1><div class="sub">Last run, budget and health. Your own searches are under Dashboard → <a href="#">mine</a>.</div></div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">Last run · Tue 06:00</div><div class="v">Success</div><div class="d">212 lookups · 38 flight sets · 41 min · 2 failed</div></div>
+        <div class="kpi paused"><div class="k">Database</div><div class="v">Paused</div><div class="d">free allowance used <b>31%</b> · resets Dec 1<div class="bar"><i style="width:31%"></i></div></div></div>
+        <div class="kpi"><div class="k">Storage</div><div class="v">1.9 GB</div><div class="d">of 32 GB<div class="bar"><i style="width:6%"></i></div></div></div>
+        <div class="kpi"><div class="k">Compute (API + Web)</div><div class="v">22%</div><div class="d">of the free grant · as of yesterday<div class="bar"><i style="width:22%"></i></div></div></div>
+        <div class="kpi"><div class="k">Digests this month</div><div class="v">46</div><div class="d">44 sent · 2 failed · <a href="#">deliveries</a></div></div>
+        <div class="kpi live"><div class="k">Scraper</div><div class="v">Seen Tue 06:41</div><div class="d">NUC · next run Fri 06:00</div></div>
+        <div class="kpi"><div class="k">Users</div><div class="v">9</div><div class="d">7 active · 22 searches · <a href="#">users</a></div></div>
+        <div class="kpi"><div class="k">Seconds per lookup</div><div class="v">11.6</div><div class="d">politeness 2.5 s + jitter</div></div>
+      </div>
+      <div class="card">
+        <h2>Needs attention</h2>
+        <ul class="movers">
+          <li><div class="what">2 deliveries failed Tue<small>SMTP 4.7.0 rate limited · retry available</small></div><a href="#">Deliveries</a></li>
+          <li><div class="what">Sandals Halcyon offline since Nov 1<small>catalog snapshot · 3 searches affected</small></div><a href="#">Reference data</a></li>
+          <li><div class="what">Alice has 6 active searches<small>limit is 5 · oldest deactivates Fri unless raised</small></div><a href="#">Users</a></li>
+        </ul>
+      </div>
+    </section>
+    <!-- ===== MATRICES ===== -->
+    <section data-screen="matrices">
+      <div class="page-h">
+        <div><h1>Searches</h1><div class="sub">Your saved searches. An Active search runs about twice a week.</div></div>
+        <button class="btn primary" data-go="editor">+ New search</button>
+      </div>
+      <div class="toolbar">
+        <button class="chip" aria-pressed="true">All <span class="meta">5</span></button>
+        <button class="chip">Active <span class="meta">3</span></button>
+        <button class="chip">Draft <span class="meta">1</span></button>
+        <button class="chip">Inactive <span class="meta">1</span></button>
+        <input class="search" placeholder="Find by name, resort, airport…">
+        <span class="sp"></span>
+        <span class="admin-only-inline"><span class="meta">Owner</span><select class="select"><option>Mine</option><option>All owners</option><option>Alice Smith</option><option>Bob Jones</option></select></span>
+        <select class="select"><option>Sort: biggest drop</option><option>Name</option><option>Priority</option><option>Last searched</option></select>
+      </div>
+      <div class="card">
+        <table class="mx">
+          <thead><tr><th>Search</th><th>Window</th><th>Resorts · airports</th><th class="num">Prio</th><th>Last searched</th><th class="num">Cheapest</th><th class="num">vs last</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr class="row" data-go="editor">
+              <td class="first"><div class="name">Feb–Mar St. Lucia scouting</div><div class="meta">7 nights · 2 adults · flights <span class="admin-only-inline owner">· Alice Smith</span></div></td>
+              <td class="hide-ph">Feb 15 – Mar 15 <span class="meta">recurring</span></td>
+              <td class="hide-ph"><span class="pill">SLU</span><span class="pill">SGL</span><span class="pill off">SHL offline</span> <span class="pill">PHL</span><span class="pill">EWR</span></td>
+              <td class="num hide-ph"><span class="prio">20</span></td>
+              <td class="hide-ph">Tue 06:12 <span class="meta">14/14</span></td>
+              <td class="num"><span class="price">$7,212</span></td>
+              <td class="num"><span class="delta down">▼ $486</span></td>
+              <td><span class="st active">Active</span></td>
+              <td class="actions"><button class="btn" data-go="editor">Edit</button><button class="btn ghost">Deactivate</button></td>
+            </tr>
+            <tr class="row">
+              <td class="first"><div class="name">Jamaica, late April</div><div class="meta">10 nights · 2 adults · flights <span class="admin-only-inline owner">· Alice Smith</span></div></td>
+              <td class="hide-ph">Apr 20 – May 5 <span class="meta">recurring</span></td>
+              <td class="hide-ph"><span class="pill">SRC</span><span class="pill">SWH</span> <span class="pill">PHL</span></td>
+              <td class="num hide-ph"><span class="prio">50</span></td>
+              <td class="hide-ph">Tue 06:31 <span class="meta">32/32</span></td>
+              <td class="num"><span class="price">$9,840</span></td>
+              <td class="num"><span class="delta up">▲ $120</span></td>
+              <td><span class="st active">Active</span></td>
+              <td class="actions"><button class="btn">Edit</button><button class="btn ghost">Deactivate</button></td>
+            </tr>
+            <tr class="row">
+              <td class="first"><div class="name">Grenada, no flights</div><div class="meta">7 nights · 2 adults <span class="admin-only-inline owner">· Alice Smith</span></div></td>
+              <td class="hide-ph">Jun 1 – Jun 30 <span class="meta">recurring</span></td>
+              <td class="hide-ph"><span class="pill">SGR</span></td>
+              <td class="num hide-ph"><span class="prio">50</span></td>
+              <td class="hide-ph">Tue 06:40 <span class="meta">30/30</span></td>
+              <td class="num"><span class="price">$5,105</span></td>
+              <td class="num"><span class="delta flat">—</span></td>
+              <td><span class="st active">Active</span></td>
+              <td class="actions"><button class="btn">Edit</button><button class="btn ghost">Deactivate</button></td>
+            </tr>
+            <tr class="row">
+              <td class="first"><div class="name">Anniversary — Antigua</div><div class="meta">7 nights · 2 adults · flights <span class="admin-only-inline owner">· Alice Smith</span></div></td>
+              <td class="hide-ph">Oct 3 – Oct 17 2026 <span class="meta">one-time · window passed</span></td>
+              <td class="hide-ph"><span class="pill">SAN</span> <span class="pill">PHL</span></td>
+              <td class="num hide-ph"><span class="prio">50</span></td>
+              <td class="hide-ph">Sep 30 <span class="meta">15/15</span></td>
+              <td class="num"><span class="price meta">$6,930</span></td>
+              <td class="num"><span class="delta flat">—</span></td>
+              <td><span class="st inactive">Inactive</span></td>
+              <td class="actions"><button class="btn">Edit</button><button class="btn ghost">Reactivate</button></td>
+            </tr>
+            <tr class="row">
+              <td class="first"><div class="name">Barbados idea</div><div class="meta">5 nights · 2 adults <span class="admin-only-inline owner">· Alice Smith</span></div></td>
+              <td class="hide-ph"><span class="meta">no window yet</span></td>
+              <td class="hide-ph"><span class="pill">SBR</span></td>
+              <td class="num hide-ph"><span class="prio">50</span></td>
+              <td class="hide-ph"><span class="meta">never</span></td>
+              <td class="num"><span class="meta">—</span></td>
+              <td class="num"><span class="delta flat">—</span></td>
+              <td><span class="st draft">Draft</span></td>
+              <td class="actions"><button class="btn">Edit</button><button class="btn ghost danger">Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="hint" style="margin-top:10px">Inactive searches keep their results. Delete is offered only for Drafts that never ran.</p>
+    </section>
+
+    <!-- ===== MATRIX EDITOR ===== -->
+    <section data-screen="editor">
+      <div class="ed-h">
+        <div class="crumbs"><a href="#" data-go="matrices">Searches</a> › Feb–Mar St. Lucia scouting</div>
+        <h1>Edit search</h1>
+        <span class="st active">Active</span>
+        <button class="btn ghost" data-go="matrices">Cancel</button>
+        <button class="btn">Deactivate</button>
+        <button class="btn primary">Save</button>
+      </div>
+
+      <div class="panes">
+        <!-- LEFT: what gets searched -->
+        <div class="pane">
+          <h2>What to search <small>every combination is downloaded</small></h2>
+          <div class="body">
+            <div class="frow">
+              <div class="f" style="flex:3"><label>Name</label><input type="text" value="Feb–Mar St. Lucia scouting"></div>
+              <div class="f" style="flex:0"><label>Priority <span class="meta">(lower runs first)</span></label><input type="number" value="20" min="1" max="99"></div>
+            </div>
+
+            <div class="f">
+              <label>Check-in window</label>
+              <div class="seg"><button aria-pressed="true">Recurring every year</button><button aria-pressed="false">One-time dates</button></div>
+              <div class="frow" style="margin-top:8px">
+                <div class="f"><label>From</label><select><option>Feb</option></select> <select><option>15</option></select></div>
+                <div class="f"><label>To</label><select><option>Mar</option></select> <select><option>15</option></select></div>
+                <div class="f"><label>Nights</label><input type="number" value="7" min="1" max="21"></div>
+              </div>
+              <div class="hint">Resolves to <b>Feb 15 – Mar 15 2027</b> on the next run (earliest check-in is today + 4 days). Year-wrapping windows like Dec 20 – Jan 10 are fine.</div>
+            </div>
+
+            <div class="frow">
+              <div class="f"><label>Adults</label><input type="number" value="2" min="1" max="4"></div>
+              <div class="f"><label>Children <span class="meta">· Beaches only</span></label><input type="number" value="0" disabled></div>
+              <div class="f"><label>Cabin</label><select><option>Economy</option><option>Premium economy</option><option>Business</option></select></div>
+            </div>
+            <div class="f">
+              <label class="toggle"><input type="checkbox" checked><i></i> Include flights</label>
+              <div class="hint">Airfare is priced once per island gateway, departure airport and date — shared across every search that wants it.</div>
+            </div>
+
+            <div class="f">
+              <label>Resorts <span class="meta">· grouped by island; the gateway is where flights land</span></label>
+              <details class="island" open>
+                <summary><span>St. Lucia <span class="gw">· UVF</span></span><span class="meta">2 of 3</span></summary>
+                <label class="opt"><input type="checkbox" checked> Sandals Grande St. Lucian <span class="tag">SLU · 5 mi from UVF</span></label>
+                <label class="opt"><input type="checkbox" checked> Sandals Regency La Toc <span class="tag">SGL · 45 mi</span></label>
+                <label class="opt off"><input type="checkbox"> Sandals Halcyon Beach <span class="tag">SHL · offline on the site since Nov 1</span></label>
+              </details>
+              <details class="island">
+                <summary><span>Jamaica <span class="gw">· MBJ</span></span><span class="meta">0 of 6</span></summary>
+                <label class="opt"><input type="checkbox"> Sandals Royal Caribbean <span class="tag">SRC · 7 mi</span></label>
+                <label class="opt"><input type="checkbox"> Sandals Montego Bay <span class="tag">SMB · 2 mi</span></label>
+                <label class="opt"><input type="checkbox"> Sandals Negril <span class="tag">SNG · 56 mi</span></label>
+                <label class="opt"><input type="checkbox"> Sandals Ochi <span class="tag">SOR · 72 mi</span></label>
+                <label class="opt"><input type="checkbox"> Sandals Royal Plantation <span class="tag">SRP · 74 mi</span></label>
+                <label class="opt"><input type="checkbox"> Sandals South Coast <span class="tag">SWH · 61 mi</span></label>
+              </details>
+              <details class="island"><summary><span>Antigua <span class="gw">· ANU</span></span><span class="meta">0 of 1</span></summary><label class="opt"><input type="checkbox"> Sandals Grande Antigua <span class="tag">SAN · 4 mi</span></label></details>
+              <details class="island"><summary><span>Grenada <span class="gw">· GND</span></span><span class="meta">0 of 1</span></summary><label class="opt"><input type="checkbox"> Sandals Grenada <span class="tag">SGR · 12 mi</span></label></details>
+              <details class="island"><summary><span>Barbados <span class="gw">· BGI</span></span><span class="meta">0 of 2</span></summary><label class="opt"><input type="checkbox"> Sandals Barbados <span class="tag">SBR · 8 mi</span></label><label class="opt"><input type="checkbox"> Sandals Royal Barbados <span class="tag">SRB · 8 mi</span></label></details>
+            </div>
+
+            <div class="f">
+              <label>Departure airports <span class="meta">· type a code or city</span></label>
+              <div class="typeahead">
+                <input type="text" class="search" style="width:100%" value="new" placeholder="e.g. PHL or Philadelphia">
+                <div class="dd"><div class="sel"><b>EWR</b> · Newark Liberty, NJ <span class="meta">— already added</span></div><div><b>JFK</b> · New York John F. Kennedy, NY</div><div><b>LGA</b> · New York LaGuardia, NY</div><div><b>MSY</b> · New Orleans, LA</div></div>
+              </div>
+              <div class="chips"><span class="achip"><b>PHL</b><small>Philadelphia</small><button title="Remove">✕</button></span><span class="achip"><b>EWR</b><small>Newark</small><button title="Remove">✕</button></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: what the digest shows -->
+        <div class="pane">
+          <h2>Digest filters <small>what the digest shows — everything is still downloaded</small></h2>
+          <div class="body">
+            <div class="f"><label>Room level</label>
+              <div class="checks"><label><input type="checkbox" checked> Club</label><label><input type="checkbox" checked> Butler</label><label><input type="checkbox"> Luxury</label><label class="dim"><input type="checkbox"> Premium <span class="meta">(not seen in 6 runs)</span></label></div></div>
+            <div class="f"><label>Room view</label>
+              <div class="checks"><label><input type="checkbox" checked> Ocean view</label><label><input type="checkbox" checked> Beachfront</label><label><input type="checkbox"> Garden view</label><label><input type="checkbox"> Pool view</label></div></div>
+            <div class="f"><label>Room type</label>
+              <div class="checks"><label><input type="checkbox"> Suite</label><label><input type="checkbox"> Rondoval</label><label><input type="checkbox"> Swim-up</label><label><input type="checkbox"> Villa</label><label><input type="checkbox"> Room</label></div></div>
+            <div class="f"><label>Must have</label>
+              <div class="checks"><label><input type="checkbox" checked> Private pool</label><label><input type="checkbox"> Soaking tub</label><label><input type="checkbox"> Balcony</label><label><input type="checkbox"> Tranquility Soaking Tub™</label></div>
+              <div class="hint">Vocabulary is discovered from results; a value that stops appearing is greyed, never deleted.</div></div>
+            <div class="frow">
+              <div class="f"><label>Max travel time <span class="meta">each way</span></label><input type="number" value="10"> <span class="meta">h</span></div>
+              <div class="f"><label>Max stops</label><input type="number" value="1" min="0" max="3"></div>
+              <div class="f"><label>Max total price <span class="meta">room + flights</span></label><input type="number" value="9000" step="100"></div>
+            </div>
+          </div>
+          <h2>Recipients</h2>
+          <div class="body">
+            <div class="recip"><span class="who">alice.smith@gmail.com</span><span class="meta">you · from your sign-in</span></div>
+            <div class="recip admin-only-inline"><span class="who">tom.smith@gmail.com</span><span class="meta">added by Admin</span><button class="btn ghost">Remove</button></div>
+            <div class="hint" style="padding:6px 0 10px">Digests go to the address you signed in with. Adding someone else (your spouse, say) is coming — ask Chris to add them for now.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fanout">
+        <span class="calc"><b>2</b> <span>resorts</span></span><span class="meta">×</span>
+        <span class="calc"><b>29</b> <span>check-in dates</span></span><span class="meta">=</span>
+        <span class="calc"><b>58</b> <span>room lookups</span></span>
+        <span class="meta">·</span><span class="calc"><b>2</b> <span>airports</span> → <b>58</b> <span>flight lookups</span> <span class="meta">(1 gateway)</span></span>
+        <span class="meta">·</span><span class="calc"><span>≈</span> <b>24 min</b> <span>per run</span></span>
+        <span class="sp"></span>
+        <span class="warn">1 resort offline — skipped until it's back</span>
+        <button class="btn ghost" data-go="matrices">Cancel</button><button class="btn primary">Save</button>
+      </div>
+    </section>
+
+    <footer class="foot">Barefoot Vacation is an independent tool and is not affiliated with or endorsed by Sandals Resorts International. “Sandals” and “Beaches” are trademarks of their owner and are used only to identify the resorts this tool searches. Prices come from the public booking site and may change at any time.</footer>
+  </main>
+
+  <!-- ===== FIRST SIGN-IN: disclaimer, acknowledged once per user per disclaimer version ===== -->
+  <div class="modal-back" id="disclaimerModal" role="dialog" aria-modal="true" aria-labelledby="discTitle">
+    <div class="modal">
+      <div class="modal-h">
+        <div class="logo" aria-hidden="true" style="width:28px;height:28px;border-radius:8px;flex:none"><svg width="16" height="16" viewBox="0 0 18 18"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="currentColor" opacity=".55"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="currentColor" opacity=".55"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="currentColor"/></svg></div>
+        <div><h2 id="discTitle">Before you start</h2><div class="meta">Shown once. You'll see it again only if this text changes.</div></div>
+      </div>
+      <div class="disc">
+        <p><b>Barefoot Vacation is an independent tool.</b> It is not affiliated with, endorsed by or connected to Sandals Resorts International. “Sandals” and “Beaches” are trademarks of their owner and appear here only to identify the resorts this tool searches.</p>
+        <p><b>Prices are not quotes.</b> Every price comes from the public booking site at the moment it was searched and can change at any time. Book on the resort's own site; this tool never books, holds or pays for anything.</p>
+        <p><b>Searches run on a schedule, not on demand.</b> Your saved searches run about twice a week, politely, one lookup at a time. A digest is e-mailed to the address you signed in with when prices move.</p>
+        <p><b>Your data.</b> You see only your own searches and results. Changes you make are recorded against your name. The owner of this tool (Chris) can see everything in order to run it. Nothing is shared with Sandals or anyone else.</p>
+        <p><b>Personal, non-commercial use</b> by invited people only. Use it in keeping with the booking site's terms.</p>
+        <label class="disc-ack"><input type="checkbox" id="discCheck" onchange="document.getElementById('discGo').disabled=!this.checked"> I have read and understood the above.</label>
+      </div>
+      <div class="modal-f">
+        <span class="meta">v1 · 2026-11-06</span>
+        <span class="sp"></span>
+        <button class="btn ghost" onclick="declineDisclaimer()">Decline and sign out</button>
+        <button class="btn primary" id="discGo" disabled onclick="acceptDisclaimer()">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== NOTICES (modal on landing; per-user acknowledgement) ===== -->
+  <div class="modal-back" id="noticesModal" role="dialog" aria-modal="true" aria-labelledby="noticesTitle">
+    <div class="modal">
+      <div class="modal-h">
+        <span class="ic">!</span>
+        <div><h2 id="noticesTitle">Needs your attention</h2><div class="meta">New since your last visit · acknowledging stops this pop-up; the issue stays on your Dashboard until it is resolved</div></div>
+      </div>
+      <ul class="nlist" id="nlist"></ul>
+      <div class="modal-f">
+        <span class="meta" id="nleft">2 unacknowledged</span>
+        <span class="sp"></span>
+        <button class="btn ghost" onclick="closeNotices()">Later</button>
+        <button class="btn primary" onclick="ackAll()">Acknowledge all</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SIGN-IN (mockup view) ===== -->
+  <section class="signin" id="signin">
+    <div class="signin-card">
+      <div class="brand big"><div class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 18 18"><rect x="1" y="1" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="10" y="1" width="7" height="7" rx="1.5" fill="currentColor" opacity=".55"/><rect x="1" y="10" width="7" height="7" rx="1.5" fill="currentColor" opacity=".55"/><rect x="10" y="10" width="7" height="7" rx="1.5" fill="currentColor"/></svg></div><div><div class="name">Barefoot Vacation</div><div class="env">for Sandals &amp; Beaches resorts</div></div></div>
+      <p class="lead">Search every date, resort and departure airport you'd consider — once — and get a digest twice a week when prices move.</p>
+      <button class="btn primary wide">Sign in with Microsoft</button>
+      <button class="btn wide">Sign in with Google</button>
+      <p class="small">By invitation only. Ask Chris for access.</p>
+      <p class="small legal">Not affiliated with or endorsed by Sandals Resorts International. “Sandals” and “Beaches” are trademarks of their owner, used only to identify the resorts this tool searches.</p>
+    </div>
+  </section>
+
+  <!-- ---------- phone tab bar ---------- -->
+  <nav class="tabbar" aria-label="Main">
+    <a class="active" href="#" data-go="dashboard"><i>▦</i>Dashboard</a><a href="#" data-go="matrices"><i>▤</i>Searches</a><a href="#"><i>≡</i>Results</a><a href="#"><i>✉</i>Digests</a><a href="#"><i>☺</i>Profile</a>
+  </nav>
+</div></div></div>
+
+<script>
+  const R=document.documentElement;
+  function press(prefix,val){document.querySelectorAll('[id^="'+prefix+'-"]').forEach(b=>b.setAttribute('aria-pressed',b.id==prefix+'-'+val));}
+  function setTheme(t){R.dataset.theme=t;press('t',t)}
+  function setRole(r){R.dataset.role=r;press('r',r);if(window.renderIssues)renderIssues();document.querySelector('.me .avatar').textContent=r==='admin'?'CW':'AS';document.querySelector('.me .who').innerHTML=(r==='admin'?'Chris Wolfgang<br><small>Admin · Sign out</small>':'Alice Smith<br><small>Editor · Sign out</small>')}
+  function setDevice(d){R.dataset.device=d;press('d',d)}
+  function setView(v){R.dataset.view=v;press('v',v)}
+  const notes={dashboard:"Dashboard · Searches → Edit opens the editor",matrices:"Searches · click a row or Edit",editor:"Search editor · desktop-first; Phone shows the stacked fallback"};
+  function show(name){
+    document.querySelectorAll('[data-screen]').forEach(s=>s.classList.toggle('on',s.dataset.screen===name));
+    const navName=name==='editor'?'matrices':name;
+    document.querySelectorAll('[data-go]').forEach(a=>{ if(a.closest('.nav')||a.closest('.tabbar')) a.classList.toggle('active',a.dataset.go===navName); });
+    if(!document.querySelector('[data-screen="'+name+'"]')){ document.getElementById('note').textContent=({results:'Results',digests:'My digests',profile:'Profile',deliveries:'Deliveries'}[name]||name)+' — not drawn yet'; return; }
+    document.getElementById('note').textContent=notes[name]||name;
+    document.querySelector('main').scrollTop=0;
+  }
+  document.addEventListener('click',e=>{const g=e.target.closest('[data-go]'); if(g){e.preventDefault(); e.stopPropagation(); show(g.dataset.go);}});
+  const acked=new Set();
+  const ISSUES=[
+    {id:1,sev:'bad',title:"We couldn't e-mail your digest to alice.smith@gmail.com",text:"Tuesday's digest for <b>Feb–Mar St. Lucia scouting</b> was rejected by the mail server (mailbox full). It will be sent again automatically on the next run; you can also resend it now or check the address on your profile.",when:'Tue 06:41',resolvesWhen:'a delivery to you succeeds',actions:[['Resend now','digests'],['Check address','profile']]},
+    {id:2,sev:'warn',title:'Anniversary — Antigua was deactivated',text:'Its one-time window (Oct 3 – Oct 17, 2026) has passed. Results are kept.',when:'Sat 06:02',resolvesWhen:'you set a new window or delete the search',actions:[['Open the search','editor']]},
+    {id:3,sev:'warn',title:'Sandals Halcyon Beach is offline on the site',text:"Skipped in Tuesday's run for <b>Feb–Mar St. Lucia scouting</b>. It stays in your search and is looked up again automatically when it comes back.",when:'Tue 06:12',resolvesWhen:'the site lists it again',actions:[]},
+    {id:4,sev:'bad',title:'2 digest deliveries failed (all users)',text:'SMTP 4.7.0 rate limited on Tuesday\'s send. Deliveries has a Retry.',when:'Tue 06:41 · Admin',resolvesWhen:'the deliveries are sent',actions:[['Deliveries','deliveries']],admin:true},
+  ];
+  function issuesFor(){const admin=R.dataset.role==='admin'; return ISSUES.filter(i=>!i.admin||admin);}
+  function renderIssues(){
+    const list=document.getElementById('ilist'), items=issuesFor();
+    list.innerHTML=items.map(i=>`<li class="${i.sev} ${acked.has(i.id)?'':'new'}"><span class="sev"></span><div class="ibody"><div class="ititle">${i.title}</div><div class="itext">${i.text}</div><div class="iwhen">${i.when} · resolves when ${i.resolvesWhen}</div>${i.actions.length?'<div class="acts">'+i.actions.map(a=>`<button class="btn" data-go="${a[1]}">${a[0]}</button>`).join('')+'</div>':''}</div><span class="istate">${acked.has(i.id)?'Acknowledged':'New'}</span></li>`).join('');
+    document.getElementById('issuesCount').textContent=items.length?`· ${items.length} open`:'';
+    document.getElementById('issuesEmpty').style.display=items.length?'none':'block';
+    const nl=document.getElementById('nlist'), fresh=items.filter(i=>!acked.has(i.id));
+    nl.innerHTML=fresh.map(i=>`<li data-notice="${i.id}"><div class="nbody"><div class="ntitle">${i.title}</div><div class="ntext">${i.text}</div><div class="nwhen">${i.when}</div></div><button class="btn" onclick="ack(${i.id})">Acknowledge</button></li>`).join('');
+  }
+  function visibleNotices(){return [...document.querySelectorAll('#nlist li')];}
+  function refreshNotices(){ renderIssues(); const left=issuesFor().filter(i=>!acked.has(i.id)).length; document.getElementById('nleft').textContent=left+' new'; }
+  function openNotices(){ refreshNotices(); if(issuesFor().some(i=>!acked.has(i.id))) document.getElementById('noticesModal').classList.add('open'); }
+  function closeNotices(){document.getElementById('noticesModal').classList.remove('open'); refreshNotices();}
+  function ack(id){acked.add(id); refreshNotices(); if(!issuesFor().some(i=>!acked.has(i.id))) setTimeout(closeNotices,250);}
+  function ackAll(){issuesFor().forEach(i=>acked.add(i.id)); refreshNotices(); setTimeout(closeNotices,200);}
+  function resetNotices(){acked.clear(); openNotices();}
+  document.getElementById('noticesModal').addEventListener('click',e=>{if(e.target.id==='noticesModal') closeNotices();});
+  let disclaimerAccepted=false;
+  function openDisclaimer(){document.getElementById('discCheck').checked=false; document.getElementById('discGo').disabled=true; document.getElementById('disclaimerModal').classList.add('open');}
+  function acceptDisclaimer(){disclaimerAccepted=true; document.getElementById('disclaimerModal').classList.remove('open'); setTimeout(openNotices,250);}
+  function declineDisclaimer(){document.getElementById('disclaimerModal').classList.remove('open'); setView('signin');}
+  function firstLogin(){acked.clear(); closeNotices(); setView('app'); show('dashboard'); openDisclaimer();}
+  show('dashboard');
+  renderIssues();
+  setTimeout(openDisclaimer,400);
+</script>
+</body>
+</html>
