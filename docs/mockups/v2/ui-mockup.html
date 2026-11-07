@@ -665,13 +665,13 @@
             <div class="f"><label>Must have</label>
               <div class="checks"><label><input type="checkbox" checked> Private pool</label><label><input type="checkbox"> Soaking tub</label><label><input type="checkbox"> Balcony</label><label><input type="checkbox"> Tranquility Soaking Tub™</label></div>
               <div class="hint">Vocabulary is discovered from results; a value that stops appearing is greyed, never deleted.</div></div>
-            <div class="frow">
-              <div class="f flight-only"><label>Max flight time <span class="meta">incl. layovers, each way</span></label><input type="number" value="10"> <span class="meta">h</span></div>
-              <div class="f flight-only"><label>Max stops</label><input type="number" value="1" min="0" max="3"></div>
-              <div class="f"><label>Max drive to resort <span class="meta">from the airport</span></label><input type="number" value="90" step="15"> <span class="meta">min</span></div>
-              <div class="f"><label>Max total price <span class="meta">room + flights</span></label><input type="number" value="9000" step="100"></div>
+            <div class="f" style="max-width:220px"><label>Max drive to resort <span class="meta">from the airport</span></label><input type="number" value="90" step="15"> <span class="meta">min</span>
+              <div class="hint">From the resort's distance to its gateway airport, so it applies with or without flights.</div></div>
+            <div class="frow flight-only">
+              <div class="f"><label>Max flight time <span class="meta">incl. layovers, each way</span></label><input type="number" value="10"> <span class="meta">h</span></div>
+              <div class="f"><label>Max stops</label><input type="number" value="1" min="0" max="3"></div>
             </div>
-            <div class="hint">Drive time comes from the resort's distance to its gateway airport, so it applies with or without flights.</div>
+            <div class="f" style="max-width:220px"><label>Max total price <span class="meta">room + flights</span></label><input type="number" value="9000" step="100"></div>
           </div>
           <h2>Run order <small>when a run is long, which of your searches are looked up first</small></h2>
           <div class="body">
