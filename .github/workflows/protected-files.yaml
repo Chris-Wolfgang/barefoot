@@ -17,6 +17,7 @@ on:
   pull_request_target:  # no checkout, no execution of PR content — see the note above
     branches:
       - main
+      - develop
 
 permissions:
   contents: read

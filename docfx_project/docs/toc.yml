@@ -5,4 +5,4 @@
 - name: Getting Started
   href: getting-started.md
 - name: Project website
-  href: '{{GITHUB_REPO_URL}}'
+  href: 'https://github.com/Chris-Wolfgang/barefoot'

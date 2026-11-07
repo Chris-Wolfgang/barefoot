@@ -1,0 +1,22 @@
+{
+  "template": "Chris-Wolfgang/repo-template",
+  "commit": "574cc226d32805e67dea5bbeb74009cb218cafc5",
+  "updated": "2026-11-06",
+  "placeholders": {
+    "COPYRIGHT_HOLDER": "Chris Wolfgang",
+    "DOCS_URL": "https://Chris-Wolfgang.github.io/barefoot/",
+    "GITHUB_OWNER": "Chris-Wolfgang",
+    "GITHUB_REPO_URL": "https://github.com/Chris-Wolfgang/barefoot",
+    "GITHUB_USERNAME": "@Chris-Wolfgang",
+    "LICENSE_TYPE": "MIT",
+    "NUGET_STATUS": "Not applicable",
+    "PACKAGE_NAME": "Wolfgang.Barefoot",
+    "PROJECT_DESCRIPTION": "Flexible-date room and flight price search for Sandals & Beaches resorts",
+    "PROJECT_NAME": "Wolfgang.Barefoot",
+    "REPO_NAME": "barefoot",
+    "TEMPLATE_REPO_NAME": "repo-template",
+    "TEMPLATE_REPO_OWNER": "Chris-Wolfgang",
+    "YEAR": "2026"
+  },
+  "note": "Written by scripts/setup.ps1 and scripts/upgrade.ps1; the template commit this repository last took template-managed files from, and the placeholder values setup used."
+}

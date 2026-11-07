@@ -11,7 +11,7 @@ rule: the newest 0.x release is the supported one.
 If you discover a security vulnerability, please follow these steps:
 
 1. **Do not** create a public issue on this repository.
-2. Open the private report form: {{GITHUB_REPO_URL}}/security/advisories/new
+2. Open the private report form: https://github.com/Chris-Wolfgang/barefoot/security/advisories/new
    (or, from the repository's **Security** tab, click **Report a vulnerability**).
    GitHub's guide to this process: https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability
 3. Fill out the provided form with:

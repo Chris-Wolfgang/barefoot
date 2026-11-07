@@ -1,4 +1,4 @@
-# {{PROJECT_NAME}} Documentation
+# Wolfgang.Barefoot Documentation
 
 Welcome to the documentation section. Browse the topics in the navigation menu to get started.
 
