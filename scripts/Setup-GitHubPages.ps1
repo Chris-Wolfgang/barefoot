@@ -49,7 +49,7 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$Repository = "{{GITHUB_OWNER}}/{{REPO_NAME}}",
+    [string]$Repository = "Chris-Wolfgang/barefoot",
     
     [Parameter()]
     [switch]$EnablePages,
@@ -211,7 +211,7 @@ try {
 }
 
 # Determine repository
-if ($Repository -eq "{{GITHUB_OWNER}}/{{REPO_NAME}}" -or -not $Repository) {
+if ($Repository -eq "Chris-Wolfgang/barefoot" -or -not $Repository) {
     # Placeholders not replaced or no repository specified - auto-detect
     Write-Info "Detecting current repository..."
     try {
@@ -219,7 +219,7 @@ if ($Repository -eq "{{GITHUB_OWNER}}/{{REPO_NAME}}" -or -not $Repository) {
         $Repository = $repoInfo.nameWithOwner
         Write-Success "Using repository: $Repository"
     } catch {
-        if ($Repository -eq "{{GITHUB_OWNER}}/{{REPO_NAME}}") {
+        if ($Repository -eq "Chris-Wolfgang/barefoot") {
             Write-Error-Custom "Could not detect repository. Please run the setup script (pwsh ./scripts/setup.ps1) first to replace placeholders, or specify -Repository parameter."
         } else {
             Write-Error-Custom "Could not detect repository. Please run from within a git repository or specify -Repository parameter."
@@ -321,11 +321,11 @@ if ($needsDocFxConfig) {
     
     # Create replacements hashtable
     $replacements = @{
-        '{{PROJECT_NAME}}' = $projectName
-        '{{PROJECT_DESCRIPTION}}' = $projectDescription
-        '{{PACKAGE_NAME}}' = $packageName
-        '{{GITHUB_REPO_URL}}' = $githubRepoUrl
-        '{{DOCS_URL}}' = $docsUrl
+        'Wolfgang.Barefoot' = $projectName
+        'Flexible-date room and flight price search for Sandals & Beaches resorts' = $projectDescription
+        'Wolfgang.Barefoot' = $packageName
+        'https://github.com/Chris-Wolfgang/barefoot' = $githubRepoUrl
+        'https://Chris-Wolfgang.github.io/barefoot/' = $docsUrl
     }
     
     # Files to update

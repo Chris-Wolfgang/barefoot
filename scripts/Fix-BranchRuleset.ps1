@@ -21,9 +21,9 @@
 .PARAMETER Force
     Skip the confirmation prompt and proceed automatically. Alias: -y
 
-.PARAMETER RequireLinearHistory
-    Forwarded to Setup-BranchRuleset.ps1 when the ruleset is recreated (adds the
-    required_linear_history rule and limits merges to squash/rebase).
+.PARAMETER AllowMergeCommits
+    Forwarded to Setup-BranchRuleset.ps1 when the ruleset is recreated (leaves out the
+    required_linear_history rule and keeps merge commits allowed; linear history is the default).
 
 .EXAMPLE
     .\Fix-BranchRuleset.ps1
@@ -45,14 +45,14 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$Repository = "{{GITHUB_OWNER}}/{{REPO_NAME}}",
+    [string]$Repository = "Chris-Wolfgang/barefoot",
 
     [Parameter()]
     [Alias("y")]
     [switch]$Force,
 
     [Parameter()]
-    [switch]$RequireLinearHistory
+    [switch]$AllowMergeCommits
 )
 
 # Check if gh CLI is installed
@@ -86,14 +86,14 @@ if ($Repository) {
 }
 
 # Determine repository
-if ($Repository -eq "{{GITHUB_OWNER}}/{{REPO_NAME}}" -or -not $Repository) {
+if ($Repository -eq "Chris-Wolfgang/barefoot" -or -not $Repository) {
     Write-Host "Detecting current repository..." -ForegroundColor Cyan
     try {
         $repoInfo = gh repo view --json nameWithOwner | ConvertFrom-Json
         $Repository = $repoInfo.nameWithOwner
         Write-Host "Using repository: $Repository" -ForegroundColor Green
     } catch {
-        if ($Repository -eq "{{GITHUB_OWNER}}/{{REPO_NAME}}") {
+        if ($Repository -eq "Chris-Wolfgang/barefoot") {
             Write-Error "Could not detect repository. Please run the setup script first to replace placeholders, or specify -Repository parameter."
         } else {
             Write-Error "Could not detect repository. Please run from within a git repository or specify -Repository parameter."
@@ -312,7 +312,7 @@ if ($errors -gt 0) {
 
 Write-Host "Running Setup-BranchRuleset.ps1 to create a fresh ruleset..." -ForegroundColor Cyan
 Write-Host ""
-& $setupScript -Repository $Repository -RequireLinearHistory:$RequireLinearHistory
+& $setupScript -Repository $Repository -AllowMergeCommits:$AllowMergeCommits
 $setupExit = $LASTEXITCODE
 
 if ($setupExit -ne 0) {

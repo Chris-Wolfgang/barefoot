@@ -64,7 +64,7 @@ jobs:
         id: detect
         shell: bash
         run: |
-          csproj='benchmarks/{{PROJECT_NAME}}.Benchmarks/{{PROJECT_NAME}}.Benchmarks.csproj'
+          csproj='benchmarks/Wolfgang.Barefoot.Benchmarks/Wolfgang.Barefoot.Benchmarks.csproj'
           if [ -f "$csproj" ]; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "✅ Benchmark project found: $csproj"
@@ -75,22 +75,22 @@ jobs:
 
       - name: Setup .NET
         if: steps.detect.outputs.exists == 'true'
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68  # v6.0.0
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73  # v6.1.0
         with:
           dotnet-version: |
             10.0.x
 
       - name: Restore
         if: steps.detect.outputs.exists == 'true'
-        run: dotnet restore "benchmarks/{{PROJECT_NAME}}.Benchmarks/{{PROJECT_NAME}}.Benchmarks.csproj"
+        run: dotnet restore "benchmarks/Wolfgang.Barefoot.Benchmarks/Wolfgang.Barefoot.Benchmarks.csproj"
 
       - name: Build (Release)
         if: steps.detect.outputs.exists == 'true'
-        run: dotnet build -c Release --no-restore "benchmarks/{{PROJECT_NAME}}.Benchmarks/{{PROJECT_NAME}}.Benchmarks.csproj"
+        run: dotnet build -c Release --no-restore "benchmarks/Wolfgang.Barefoot.Benchmarks/Wolfgang.Barefoot.Benchmarks.csproj"
 
       - name: Run benchmarks
         if: steps.detect.outputs.exists == 'true'
-        working-directory: benchmarks/{{PROJECT_NAME}}.Benchmarks
+        working-directory: benchmarks/Wolfgang.Barefoot.Benchmarks
         # ShortRun keeps total runtime small (~3-5 min). GitHub-hosted runners
         # are noisy, so chart trends are reliable for allocations and double-digit
         # time changes; smaller deltas are not.
@@ -99,7 +99,7 @@ jobs:
       - name: Merge per-class BDN reports
         if: steps.detect.outputs.exists == 'true'
         id: locate
-        working-directory: benchmarks/{{PROJECT_NAME}}.Benchmarks
+        working-directory: benchmarks/Wolfgang.Barefoot.Benchmarks
         run: |
           # BDN's --exporters json writes one *-report-full-compressed.json per
           # benchmark class. github-action-benchmark consumes a single file, so
@@ -120,7 +120,7 @@ jobs:
             HostEnvironmentInfo: .[0].HostEnvironmentInfo,
             Benchmarks: [.[].Benchmarks[]]
           }' "${reports[@]}" > benchmarks-result.json
-          echo "report=benchmarks/{{PROJECT_NAME}}.Benchmarks/benchmarks-result.json" >> "$GITHUB_OUTPUT"
+          echo "report=benchmarks/Wolfgang.Barefoot.Benchmarks/benchmarks-result.json" >> "$GITHUB_OUTPUT"
 
       - name: Publish chart to gh-pages
         if: steps.detect.outputs.exists == 'true'
