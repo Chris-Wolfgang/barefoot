@@ -327,7 +327,7 @@ the system. Everything an Editor sees is reachable from a matrix they own.
 | | Editor / Viewer | Admin (adds) |
 |---|---|---|
 | Landing | **Dashboard** — my matrices at a glance (status, last searched, cheapest, ▼/▲ vs last capture), last digest, next scheduled run, needs-attention (window passed, resort offline); first sign-in shows one action, "Create your first matrix" | **System dashboard** — last run (status, duration, items, failures, seconds per item), **Budget & health** (below) |
-| Work | **Matrices** → **Matrix editor** | Owner column + owner filter; "mine" by default, "all owners" toggle; can open any matrix |
+| Work | **Searches** → **Search editor** (below) | Owner column + owner filter; "mine" by default, "all owners" toggle; can open any search |
 | Read | **Results** — matrix + *capture date* pickers (runs are Admin objects), filters-only toggle, paged grid, cheapest flight per departure airport | any owner |
 | Read | **Price history** — over *my* captures only (v1) | cross-user view over all captures |
 | Read | **My digests** — every digest sent to me, rendered from the stored body, linking to its results | **Deliveries** — every delivery, status, attempts, error, resend |
@@ -344,6 +344,17 @@ the system. Everything an Editor sees is reachable from a matrix they own.
 - Dropped from v1: user-facing Settings (becomes Admin **System**); Run history for non-admins;
   "Refresh now" on Reference data (scraping is `bf-scraper` on the home machine, not the web).
 - Future version: a first-run tour / wizard.
+
+**Search editor (locked 2026-11-06, mockup v31).** Two panes and a sticky fan-out footer. *What to
+search*: Name (unique per owner), Brand (Sandals / Beaches — Children and Infants only for Beaches),
+Check-in window (recurring month + day, or one-time date pickers), Adults, Resorts grouped by island
+with the gateway code, then a flight section — Include flights, Cabin, Departure airports — that is
+hidden entirely when flights are off. *Digest filters*: the room vocabularies (stale values greyed,
+"not seen in N runs" under the name), Max total price, Max drive to resort (derived from the
+resort's distance to its gateway; applies without flights), Max flight time incl. layovers and Max
+stops (flights only). *Run order* is its own section: Low / Below normal / Normal / Above normal /
+High stored as 1 / 25 / 50 / 75 / 99; ties run in creation order. *Recipients* last. The footer shows
+resorts × dates → room lookups, airports → flight lookups, minutes per run, and holds Cancel / Save.
 
 **Budget & health (Admin dashboard).** Table-backed cards ship with the dashboard; the Azure
 Monitor cards follow once the API's managed identity has *Reader* on the database and
