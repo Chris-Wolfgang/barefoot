@@ -133,7 +133,9 @@
   table.rt th .meta{white-space:normal;font-weight:500;text-transform:none;letter-spacing:0} table.rt .tot{font-size:14px} table.rt td.num .delta{font-size:11.5px;font-weight:600;margin-top:2px}
   table.rt tr.fltrow td{padding:0 12px 12px;border-bottom:1px solid var(--line);background:var(--surface-2)}
   .fdetail{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:10px;padding:10px 0 0}
-  .fleg{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12.5px} .fleg .fhead{margin-bottom:4px} .fleg .seg-l{display:flex;gap:8px;padding:2px 0;color:var(--ink-2)} .fleg .dir{color:var(--ink-3);font-weight:600;width:34px;flex:none;text-transform:uppercase;font-size:10.5px;letter-spacing:.04em;padding-top:2px} .fleg .more{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:12px} table.rt .flt{line-height:1.5} :root:not([data-role="admin"]) .rform .admin-only-inline{display:none!important}
+  .fleg{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12.5px} .fleg .fhead{margin-bottom:4px} .fleg .seg-l{display:flex;gap:8px;padding:2px 0;color:var(--ink-2)} .fleg .dir{color:var(--ink-3);font-weight:600;width:34px;flex:none;text-transform:uppercase;font-size:10.5px;letter-spacing:.04em;padding-top:2px} .fleg .more{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:12px} .fleg .more.done{color:var(--ink-3)}
+  .fleg .opts .opt-r{display:grid;grid-template-columns:62px 1fr 1fr;gap:4px 10px;padding:6px 0;border-top:1px dashed var(--line);font-size:12px;color:var(--ink-2)} .fleg .opts .opt-r .pr{font-weight:600;color:var(--ink)} .fleg .opts .opt-r .lg{white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .fleg .opts .opt-r .lg small{color:var(--ink-3)}
+  :root[data-device="phone"] .fleg .opts .opt-r{grid-template-columns:62px 1fr} :root[data-device="phone"] .fleg .opts .opt-r .lg:last-child{grid-column:2} table.rt .flt{line-height:1.5} :root:not([data-role="admin"]) .rform .admin-only-inline{display:none!important}
   .pager{display:flex;gap:8px;align-items:center;padding:10px 14px} .pager .sp{flex:1}
   :root[data-device="phone"] table.rt thead{display:none} :root[data-device="phone"] table.rt .hide-ph{display:none}
   :root[data-device="phone"] table.rt tr.rr-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 12px;border-bottom:1px solid var(--line)}
@@ -622,44 +624,44 @@
               <td class="first"><div class="name">Grande St. Lucian</div><div class="meta">Tue Feb 24 &middot; 7 nights</div></td>
               <td class="room"><div class="name">Beachfront Club Level Room</div><div class="meta"><span class="pill lv">Club</span> Beachfront</div></td>
               <td class="num hide-ph rp"><div class="reg"><s>$6,410</s></div><div class="price">$4,918</div><div class="promo">$1,500 off + $175 spa credit</div></td>
-              <td class="fcell"><button class="flt" onclick="toggleFlt(1,event)" aria-expanded="false"><b>PHL</b> $612 <span class="meta">&ndash;$1,048 &middot; 6 options</span><br><b>EWR</b> $688 <span class="meta">&ndash;$1,102 &middot; 4</span> <span class="car">&#9662;</span></button></td>
+              <td class="fcell"><button class="flt" onclick="toggleFlt(1,event)" aria-expanded="false"><b>PHL</b> $612 <span class="meta">&ndash;$1,048 &middot; 36 options</span><br><b>EWR</b> $688 <span class="meta">&ndash;$1,102 &middot; 5</span> <span class="car">&#9662;</span></button></td>
               <td class="num"><span class="price tot">$6,142</span><div class="delta down">&#9660; $486 vs Sat</div></td>
             </tr>
             <tr class="fltrow" id="flt1" style="display:none"><td colspan="5"><div class="fdetail">
               <div class="fleg"><div class="fhead"><b>PHL</b> &middot; <b>$612</b> <span class="meta">round trip &middot; 2 adults &middot; economy</span> <span class="st rs ok">cheapest</span></div>
                 <div class="seg-l"><span class="dir">Out</span><span>07:10 &rarr; MIA 10:05 (AA 1204) &middot; 1h 20m &middot; MIA 11:25 &rarr; UVF 14:15 (AA 2311) &middot; <span class="meta">6h 05m, 1 stop</span></span></div>
                 <div class="seg-l"><span class="dir">Back</span><span>UVF 15:05 &rarr; CLT 18:45 (AA 887) &middot; 55m &middot; CLT 19:40 &rarr; PHL 21:45 (AA 1650) &middot; <span class="meta">5h 40m, 1 stop</span></span></div>
-                <div class="more"><a href="#">5 more from PHL</a> <span class="meta">$698 &ndash; $1,048 &middot; 2 nonstop &middot; sorted by price, within your 10 h / 1 stop limits</span></div></div>
+                <div class="opts" id="opts-1-PHL"></div><div class="more" id="more-1-PHL"><a href="#" onclick="loadMore('1-PHL',event)">35 more from PHL</a> <span class="meta">$698 &ndash; $1,048, cheapest first &middot; 10 at a time</span></div></div>
               <div class="fleg"><div class="fhead"><b>EWR</b> &middot; <b>$688</b> <span class="meta">round trip &middot; 2 adults &middot; economy</span></div>
                 <div class="seg-l"><span class="dir">Out</span><span>06:30 &rarr; MIA 09:40 (UA 311) &middot; 1h 45m &middot; MIA 11:25 &rarr; UVF 14:15 (AA 2311) &middot; <span class="meta">6h 45m, 1 stop</span></span></div>
                 <div class="seg-l"><span class="dir">Back</span><span>UVF 15:05 &rarr; EWR 19:50 (UA 1522) &middot; <span class="meta">4h 45m, nonstop</span></span></div>
-                <div class="more"><a href="#">3 more from EWR</a> <span class="meta">$744 &ndash; $1,102</span></div></div>
+                <div class="opts" id="opts-1-EWR"></div><div class="more" id="more-1-EWR"><a href="#" onclick="loadMore('1-EWR',event)">4 more from EWR</a> <span class="meta">$744 &ndash; $1,102, cheapest first &middot; 10 at a time</span></div></div>
             </div></td></tr>
             <tr class="rr-row" id="rr2">
               <td class="first"><div class="name">Grande St. Lucian</div><div class="meta">Tue Mar 3 &middot; 7 nights</div></td>
               <td class="room"><div class="name">Beachfront Club Level Room</div><div class="meta"><span class="pill lv">Club</span> Beachfront</div></td>
               <td class="num hide-ph rp"><div class="reg"><s>$6,410</s></div><div class="price">$5,204</div><div class="promo">$1,500 off</div></td>
-              <td class="fcell"><button class="flt" onclick="toggleFlt(2,event)" aria-expanded="false"><b>PHL</b> $644 <span class="meta">&ndash;$1,110 &middot; 5 options</span><br><b>EWR</b> $702 <span class="meta">&ndash;$1,180 &middot; 3</span> <span class="car">&#9662;</span></button></td>
+              <td class="fcell"><button class="flt" onclick="toggleFlt(2,event)" aria-expanded="false"><b>PHL</b> $644 <span class="meta">&ndash;$1,110 &middot; 24 options</span><br><b>EWR</b> $702 <span class="meta">&ndash;$1,180 &middot; 3</span> <span class="car">&#9662;</span></button></td>
               <td class="num"><span class="price tot">$6,492</span><div class="delta up">&#9650; $60 vs Sat</div></td>
             </tr>
             <tr class="fltrow" id="flt2" style="display:none"><td colspan="5"><div class="fdetail">
               <div class="fleg"><div class="fhead"><b>PHL</b> &middot; <b>$644</b> <span class="meta">round trip &middot; 2 adults &middot; economy</span> <span class="st rs ok">cheapest</span></div>
                 <div class="seg-l"><span class="dir">Out</span><span>06:00 &rarr; ATL 08:25 (DL 402) &middot; 2h 10m &middot; ATL 10:35 &rarr; UVF 14:20 (DL 1877) &middot; <span class="meta">8h 20m, 1 stop</span></span></div>
                 <div class="seg-l"><span class="dir">Back</span><span>UVF 15:40 &rarr; ATL 19:05 (DL 1878) &middot; 1h &middot; ATL 20:05 &rarr; PHL 21:55 (DL 933) &middot; <span class="meta">6h 15m, 1 stop</span></span></div>
-                <div class="more"><a href="#">4 more from PHL</a> <span class="meta">$712 &ndash; $1,110</span></div></div>
+                <div class="opts" id="opts-2-PHL"></div><div class="more" id="more-2-PHL"><a href="#" onclick="loadMore('2-PHL',event)">23 more from PHL</a> <span class="meta">$712 &ndash; $1,110, cheapest first &middot; 10 at a time</span></div></div>
             </div></td></tr>
             <tr class="rr-row" id="rr3">
               <td class="first"><div class="name">Regency La Toc</div><div class="meta">Fri Feb 20 &middot; 7 nights</div></td>
               <td class="room"><div class="name">Sunset Bluff Honeymoon Oceanview Butler Villa Suite with Private Pool</div><div class="meta"><span class="pill lv">Butler</span> Ocean view</div></td>
               <td class="num hide-ph rp"><div class="reg"><s>$9,870</s></div><div class="price">$6,604</div><div class="promo">$1,000 off + 2 free nights</div></td>
-              <td class="fcell"><button class="flt" onclick="toggleFlt(3,event)" aria-expanded="false"><b>PHL</b> $613 <span class="meta">&ndash;$1,048 &middot; 6 options</span><br><b>EWR</b> $690 <span class="meta">&ndash;$1,102 &middot; 4</span> <span class="car">&#9662;</span></button></td>
+              <td class="fcell"><button class="flt" onclick="toggleFlt(3,event)" aria-expanded="false"><b>PHL</b> $613 <span class="meta">&ndash;$1,048 &middot; 18 options</span><br><b>EWR</b> $690 <span class="meta">&ndash;$1,102 &middot; 4</span> <span class="car">&#9662;</span></button></td>
               <td class="num"><span class="price tot">$7,830</span><div class="delta down">&#9660; $1,120 vs Sat</div></td>
             </tr>
             <tr class="fltrow" id="flt3" style="display:none"><td colspan="5"><div class="fdetail">
               <div class="fleg"><div class="fhead"><b>PHL</b> &middot; <b>$613</b> <span class="meta">round trip &middot; 2 adults &middot; economy</span> <span class="st rs ok">cheapest</span></div>
                 <div class="seg-l"><span class="dir">Out</span><span>07:10 &rarr; MIA 10:05 (AA 1204) &middot; 1h 20m &middot; MIA 11:25 &rarr; UVF 14:15 (AA 2311) &middot; <span class="meta">6h 05m, 1 stop</span></span></div>
                 <div class="seg-l"><span class="dir">Back</span><span>UVF 15:05 &rarr; CLT 18:45 (AA 887) &middot; 55m &middot; CLT 19:40 &rarr; PHL 21:45 (AA 1650) &middot; <span class="meta">5h 40m, 1 stop</span></span></div>
-                <div class="more"><a href="#">5 more from PHL</a> <span class="meta">$698 &ndash; $1,048 &middot; 2 nonstop &middot; sorted by price, within your 10 h / 1 stop limits</span></div></div>
+                <div class="opts" id="opts-3-PHL"></div><div class="more" id="more-3-PHL"><a href="#" onclick="loadMore('3-PHL',event)">17 more from PHL</a> <span class="meta">$699 &ndash; $1,048, cheapest first &middot; 10 at a time</span></div></div>
             </div></td></tr>
             <tr class="rr-row" id="rr4">
               <td class="first"><div class="name">Grande St. Lucian</div><div class="meta">Sat Feb 28 &middot; 7 nights</div></td>
@@ -898,11 +900,20 @@
   function setDevice(d){R.dataset.device=d;press('d',d)}
   function setView(v){R.dataset.view=v;press('v',v)}
   function toggleFlt(i,e){e.stopPropagation(); const r=document.getElementById('flt'+i), b=e.currentTarget; const open=r.style.display==='none'; r.style.display=open?'':'none'; b.setAttribute('aria-expanded',open);}
+  const MORE={'1-PHL':{n:35,lo:698,hi:1048,dest:'UVF',home:'PHL'},'1-EWR':{n:4,lo:744,hi:1102,dest:'UVF',home:'EWR'},'2-PHL':{n:23,lo:712,hi:1110,dest:'UVF',home:'PHL'},'3-PHL':{n:17,lo:699,hi:1048,dest:'UVF',home:'PHL'}};
+  const HUBS=['MIA','CLT','ATL','JFK','BOS'], AIR={MIA:'AA',CLT:'AA',ATL:'DL',JFK:'B6',BOS:'B6'};
+  function opt(key,i){const m=MORE[key]; const price=Math.round(m.lo+(m.hi-m.lo)*i/Math.max(1,m.n-1)); const hub=HUBS[(i*7+key.length)%HUBS.length]; const nonstop=(i%6===2); const dep=5+((i*3)%9), ret=12+((i*5)%7);
+    const pad=n=>String(n).padStart(2,'0');
+    const out=nonstop?`${m.home} ${pad(dep)}:${pad((i*17)%60)} &rarr; ${m.dest} ${pad(dep+5)}:${pad((i*23)%60)} <small>&middot; ${AIR.JFK} &middot; 4h 50m, nonstop</small>`:`${m.home} ${pad(dep)}:${pad((i*17)%60)} &rarr; ${hub} &rarr; ${m.dest} ${pad(dep+6+(i%3))}:${pad((i*23)%60)} <small>&middot; ${AIR[hub]} &middot; ${6+(i%3)}h ${pad((i*11)%60)}m, 1 stop</small>`;
+    const back=`${m.dest} ${pad(ret)}:${pad((i*13)%60)} &rarr; ${nonstop?'':hub+' &rarr; '}${m.home} ${pad(ret+5+(i%4))}:${pad((i*29)%60)} <small>&middot; ${nonstop?'4h 45m, nonstop':(5+(i%4))+'h '+pad((i*7)%60)+'m, 1 stop'}</small>`;
+    return `<div class="opt-r"><span class="pr">$${price.toLocaleString()}</span><span class="lg">${out}</span><span class="lg">${back}</span></div>`;}
+  function loadMore(key,e){e.preventDefault(); e.stopPropagation(); const m=MORE[key], box=document.getElementById('opts-'+key), more=document.getElementById('more-'+key); m.loaded=m.loaded||0; const take=Math.min(10,m.n-m.loaded); let h=''; for(let i=m.loaded;i<m.loaded+take;i++) h+=opt(key,i); box.insertAdjacentHTML('beforeend',h); m.loaded+=take; const left=m.n-m.loaded;
+    more.innerHTML=left>0?`<a href="#" onclick="loadMore('${key}',event)">${left} more from ${m.home}</a> <span class="meta">showing ${m.loaded+1} of ${m.n+1} &middot; next 10</span>`:`<span class="meta">All ${m.n+1} options from ${m.home} shown</span>`; more.classList.toggle('done',left===0);}
   function setScope(m){document.querySelectorAll('#scopeSeg button').forEach((b,i)=>b.setAttribute('aria-pressed',(i===0)===(m==='filtered')));}
   function setFlights(on){document.getElementById('flightFields').style.display=on?'':'none'; document.querySelectorAll('.flight-only').forEach(e=>e.style.display=on?'':'none'); document.querySelectorAll('.fanout .flights').forEach(e=>e.style.display=on?'':'none');}
   function setWindowMode(m){document.querySelectorAll('#winSeg button').forEach((b,i)=>b.setAttribute('aria-pressed', (i===0)===(m==='recurring'))); document.querySelectorAll('.win-recurring').forEach(e=>e.style.display=m==='recurring'?'':'none'); document.querySelectorAll('.win-onetime').forEach(e=>e.style.display=m==='onetime'?'':'none');}
   function setBrand(b){document.querySelectorAll('#brandSeg button').forEach((x,i)=>x.setAttribute('aria-pressed',(i===0)===(b==='sandals'))); document.querySelectorAll('.kids').forEach(e=>e.style.display=b==='beaches'?'':'none'); document.getElementById('brandHint').textContent=b==='beaches'?'Beaches resorts welcome families: children (2–15) and infants are priced differently, so they are part of the search.':'Beaches resorts are not searchable yet — the option is here so the shape is right when they are.';}
-  const notes={dashboard:"Dashboard · Searches → Edit opens the editor",matrices:"Searches · click a row or Edit",editor:"Search editor · desktop-first; Phone shows the stacked fallback",results:"Results · one search, one run; click a flight range for the cheapest legs"};
+  const notes={dashboard:"Dashboard · Searches → Edit opens the editor",matrices:"Searches · click a row or Edit",editor:"Search editor · desktop-first; Phone shows the stacked fallback",results:"Results · click a flight range for the cheapest legs; 'N more' loads ten at a time"};
   function show(name){
     document.querySelectorAll('[data-screen]').forEach(s=>s.classList.toggle('on',s.dataset.screen===name));
     const navName=name==='editor'?'matrices':name;
