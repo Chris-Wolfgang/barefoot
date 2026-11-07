@@ -12,8 +12,8 @@ Editor/Admin, Laptop/Phone, App/Sign-in page, Re-show notices.
 
 **Locked 2026-11-06 (later):** **Searches list** — name (unique per owner) + generated subtitle; window on two lines with a recurring icon (tooltip "Repeats every year") or an amber *passed* tag; resorts by short name with airports (codes) on their own line, the column never breaks a pill; last run as date + outcome pill (*Complete / In progress / Incomplete / Failed*); cheapest; vs last; status; icon actions ✎ ⏸ ▶ 🗑 with tooltips. No priority column (it lives in the editor as *Run order*).
 
-Screens so far: **First sign-in disclaimer** (one-time, per user per disclaimer version; must tick to continue; Decline signs out; precedes the notices modal), **Dashboard** (Editor: status strip, notices, my matrices, biggest movers, latest digest;
-Admin: System dashboard with budget & health tiles), **Matrices list**, **Search editor** (two panes +
+Screens so far: **First sign-in disclaimer** (one-time, per user per disclaimer version; must tick to continue; Decline signs out; precedes the notices modal), **Dashboard** (Editor: status strip, notices, Open issues, Recent results, biggest movers, latest digest;
+Admin: System dashboard with budget & health tiles), **Searches list**, **Search editor** (two panes +
 fan-out footer), the **notices modal** (per-item acknowledge), the **sign-in page**.
 Not yet drawn: My digests, Price history, Profile, Runs, Deliveries, Reference data, Users, System
 detail, the startup states, the e-mail.
