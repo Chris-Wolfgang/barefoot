@@ -202,7 +202,7 @@
   .toolbar .sp{flex:1}
   .admin-only-inline{display:none} :root[data-role="admin"] .admin-only-inline{display:inline-flex;gap:8px;align-items:center}
   :root[data-role="admin"] #nlist li.admin-only-inline{display:flex!important}
-  td.res{min-width:280px} td.res .rl,td.res .al{display:flex;flex-wrap:wrap;align-items:center} td.res .al{margin-top:2px}
+  td.res{min-width:210px} /* the longest single pill ("Grande St. Lucian · offline"); pills never break internally, they wrap one per line when the column is tight */ td.res .rl,td.res .al{display:flex;flex-wrap:wrap;align-items:center} td.res .al{margin-top:2px}
   .tag{display:inline-block;font-size:11.5px;line-height:1.35;font-weight:600;border-radius:999px;padding:3px 10px;margin-top:5px;white-space:nowrap}
   .tag.passed{background:var(--bad-soft);color:var(--bad)}
   .win{white-space:nowrap;line-height:1.45} .rec-ico{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dk);cursor:help;vertical-align:middle;margin-left:4px}
