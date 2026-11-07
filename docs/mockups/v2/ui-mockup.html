@@ -93,6 +93,7 @@
   .name{font-weight:600} .meta{color:var(--ink-3);font-size:12px}
   .pill{display:inline-block;border:1px solid var(--line-2);border-radius:999px;padding:1px 8px;font-size:11px;margin:1px 2px 1px 0;color:var(--ink-2);background:var(--surface-2)}
   .pill.off{border-style:dashed;color:var(--warn)}
+  .pill.ap{font-variant:small-caps;letter-spacing:.04em;background:transparent}
   .st{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:600}
   .st.active{background:var(--ok-soft);color:var(--ok)} .st.draft{background:var(--surface-2);color:var(--ink-3)} .st.inactive{background:var(--bad-soft);color:var(--bad)}
   .delta{font-weight:600;white-space:nowrap} .delta.down{color:var(--down)} .delta.up{color:var(--up)} .delta.flat{color:var(--ink-3)}
@@ -495,12 +496,12 @@
       </div>
       <div class="card">
         <table class="mx">
-          <thead><tr><th>Search</th><th>Window</th><th>Resorts · airports</th><th class="num">Prio</th><th>Last searched</th><th class="num">Cheapest</th><th class="num">vs last</th><th>Status</th><th></th></tr></thead>
+          <thead><tr><th>Search</th><th>Window</th><th>Resorts · from</th><th class="num">Prio</th><th>Last searched</th><th class="num">Cheapest</th><th class="num">vs last</th><th>Status</th><th></th></tr></thead>
           <tbody>
             <tr class="row" data-go="editor">
               <td class="first"><div class="name">Feb–Mar St. Lucia scouting</div><div class="meta">7 nights · 2 adults · flights <span class="admin-only-inline owner">· Alice Smith</span></div></td>
               <td class="hide-ph">Feb 15 – Mar 15 <span class="meta">recurring</span></td>
-              <td class="hide-ph"><span class="pill">SLU</span><span class="pill">SGL</span><span class="pill off">SHL offline</span> <span class="pill">PHL</span><span class="pill">EWR</span></td>
+              <td class="hide-ph"><span class="pill">Grande St. Lucian</span><span class="pill">Regency La Toc</span><span class="pill off">Halcyon Beach · offline</span> <span class="pill ap">PHL</span><span class="pill ap">EWR</span></td>
               <td class="num hide-ph"><span class="prio">20</span></td>
               <td class="hide-ph">Tue 06:12 <span class="meta">14/14</span></td>
               <td class="num"><span class="price">$7,212</span></td>
@@ -511,7 +512,7 @@
             <tr class="row">
               <td class="first"><div class="name">Jamaica, late April</div><div class="meta">10 nights · 2 adults · flights <span class="admin-only-inline owner">· Alice Smith</span></div></td>
               <td class="hide-ph">Apr 20 – May 5 <span class="meta">recurring</span></td>
-              <td class="hide-ph"><span class="pill">SRC</span><span class="pill">SWH</span> <span class="pill">PHL</span></td>
+              <td class="hide-ph"><span class="pill">Royal Caribbean</span><span class="pill">South Coast</span> <span class="pill ap">PHL</span></td>
               <td class="num hide-ph"><span class="prio">50</span></td>
               <td class="hide-ph">Tue 06:31 <span class="meta">32/32</span></td>
               <td class="num"><span class="price">$9,840</span></td>
@@ -522,7 +523,7 @@
             <tr class="row">
               <td class="first"><div class="name">Grenada, no flights</div><div class="meta">7 nights · 2 adults <span class="admin-only-inline owner">· Alice Smith</span></div></td>
               <td class="hide-ph">Jun 1 – Jun 30 <span class="meta">recurring</span></td>
-              <td class="hide-ph"><span class="pill">SGR</span></td>
+              <td class="hide-ph"><span class="pill">Grenada</span></td>
               <td class="num hide-ph"><span class="prio">50</span></td>
               <td class="hide-ph">Tue 06:40 <span class="meta">30/30</span></td>
               <td class="num"><span class="price">$5,105</span></td>
@@ -533,7 +534,7 @@
             <tr class="row">
               <td class="first"><div class="name">Anniversary — Antigua</div><div class="meta">7 nights · 2 adults · flights <span class="admin-only-inline owner">· Alice Smith</span></div></td>
               <td class="hide-ph">Oct 3 – Oct 17 2026 <span class="meta">one-time · window passed</span></td>
-              <td class="hide-ph"><span class="pill">SAN</span> <span class="pill">PHL</span></td>
+              <td class="hide-ph"><span class="pill">Grande Antigua</span> <span class="pill ap">PHL</span></td>
               <td class="num hide-ph"><span class="prio">50</span></td>
               <td class="hide-ph">Sep 30 <span class="meta">15/15</span></td>
               <td class="num"><span class="price meta">$6,930</span></td>
@@ -544,7 +545,7 @@
             <tr class="row">
               <td class="first"><div class="name">Barbados idea</div><div class="meta">5 nights · 2 adults <span class="admin-only-inline owner">· Alice Smith</span></div></td>
               <td class="hide-ph"><span class="meta">no window yet</span></td>
-              <td class="hide-ph"><span class="pill">SBR</span></td>
+              <td class="hide-ph"><span class="pill">Barbados</span></td>
               <td class="num hide-ph"><span class="prio">50</span></td>
               <td class="hide-ph"><span class="meta">never</span></td>
               <td class="num"><span class="meta">—</span></td>
