@@ -256,6 +256,7 @@
   [data-screen="editor"].on{padding-bottom:70px}
   .fanout{position:sticky;bottom:0;margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 -2px 8px rgba(16,24,40,.08);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px}
   .fanout .calc b{font-size:15px} .fanout .calc span{color:var(--ink-3)} .fanout .sp{flex:1}
+  .fanout .acts{display:flex;gap:8px;margin-left:auto;white-space:nowrap}
   .fanout .warn{color:var(--warn);font-weight:600}
   .recip{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px} .recip:last-child{border-bottom:0}
   .recip .who{flex:1} .recip .meta{color:var(--ink-3);font-size:12px}
@@ -639,8 +640,8 @@
             <div class="f">
               <label>Departure airports <span class="meta">· type a code or city</span></label>
               <div class="typeahead">
-                <input type="text" class="search" style="width:100%" value="new" placeholder="e.g. PHL or Philadelphia">
-                <div class="dd"><div class="sel"><b>EWR</b> · Newark Liberty, NJ <span class="meta">— already added</span></div><div><b>JFK</b> · New York John F. Kennedy, NY</div><div><b>LGA</b> · New York LaGuardia, NY</div><div><b>MSY</b> · New Orleans, LA</div></div>
+                <input type="text" class="search" style="width:100%" value="" placeholder="e.g. PHL or Philadelphia" onfocus="this.nextElementSibling.style.display='block'" onblur="setTimeout(()=>this.nextElementSibling.style.display='none',150)">
+                <div class="dd" style="display:none"><div class="sel"><b>EWR</b> · Newark Liberty, NJ <span class="meta">— already added</span></div><div><b>JFK</b> · New York John F. Kennedy, NY</div><div><b>LGA</b> · New York LaGuardia, NY</div><div><b>MSY</b> · New Orleans, LA</div></div>
               </div>
               <div class="chips"><span class="achip"><b>PHL</b><small>Philadelphia</small><button title="Remove">✕</button></span><span class="achip"><b>EWR</b><small>Newark</small><button title="Remove">✕</button></span></div>
             </div>
@@ -689,7 +690,7 @@
         <span class="meta">·</span><span class="calc"><span>≈</span> <b>24 min</b> <span>per run</span></span>
         <span class="sp"></span>
         <span class="warn">1 resort offline — skipped until it's back</span>
-        <button class="btn ghost" data-go="matrices">Cancel</button><button class="btn primary">Save</button>
+        <span class="acts"><button class="btn ghost" data-go="matrices">Cancel</button><button class="btn primary">Save</button></span>
       </div>
     </section>
 
