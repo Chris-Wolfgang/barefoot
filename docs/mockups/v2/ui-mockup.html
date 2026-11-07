@@ -228,7 +228,8 @@
   .pane h2 small{font-weight:400;color:var(--ink-3);margin-left:6px}
   .pane .body{padding:12px 14px 4px}
   .f{margin-bottom:12px} .f label{display:block;font-size:12px;color:var(--ink-3);margin-bottom:4px}
-  .f input[type=text],.f input[type=number],.f select{border:1px solid var(--line-2);background:var(--surface);color:var(--ink);border-radius:6px;padding:7px 9px;font:inherit}
+  .f input[type=text],.f input[type=number],.f input[type=date],.f select{border:1px solid var(--line-2);background:var(--surface);color:var(--ink);border-radius:6px;padding:7px 9px;font:inherit;font-size:13px;line-height:1.3;height:34px;box-sizing:border-box}
+  .f input[type=date]{width:160px;font-family:inherit} .f input[type=date]::-webkit-calendar-picker-indicator{opacity:.7}
   .f input[type=text]{width:100%} .f input[type=number]{width:90px}
   .frow{display:flex;gap:14px;flex-wrap:wrap} .frow .f{flex:1;min-width:140px}
   .seg{display:inline-flex;border:1px solid var(--line-2);border-radius:6px;overflow:hidden}
@@ -608,13 +609,7 @@
               <div class="f"><label>Adults</label><input type="number" value="2" min="1" max="4"></div>
               <div class="f kids" style="display:none"><label>Children <span class="meta">· 2–15</span></label><input type="number" value="0" min="0" max="4"></div>
               <div class="f kids" style="display:none"><label>Infants <span class="meta">· under 2</span></label><input type="number" value="0" min="0" max="2"></div>
-              <div class="f"><label>Cabin</label><select><option>Economy</option><option>Premium economy</option><option>Business</option></select></div>
             </div>
-            <div class="f">
-              <label class="toggle"><input type="checkbox" checked><i></i> Include flights</label>
-              <div class="hint">Airfare is priced once per island gateway, departure airport and date — shared across every search that wants it.</div>
-            </div>
-
             <div class="f">
               <label>Resorts <span class="meta">· grouped by island; the gateway is where flights land</span></label>
               <details class="island" open>
@@ -637,6 +632,12 @@
               <details class="island"><summary><span>Barbados <span class="gw">· BGI</span></span><span class="meta">0 of 2</span></summary><label class="opt"><input type="checkbox"> Sandals Barbados <span class="tag">SBR · 8 mi</span></label><label class="opt"><input type="checkbox"> Sandals Royal Barbados <span class="tag">SRB · 8 mi</span></label></details>
             </div>
 
+            <div class="f" style="margin-top:4px;padding-top:12px;border-top:1px solid var(--line)">
+              <label class="toggle"><input type="checkbox" id="flightsOn" checked onchange="setFlights(this.checked)"><i></i> Include flights</label>
+              <div class="hint">Airfare is priced once per island gateway, departure airport and date — shared across every search that wants it.</div>
+            </div>
+            <div id="flightFields">
+              <div class="f" style="max-width:220px"><label>Cabin</label><select><option>Economy</option><option>Premium economy</option><option>Business</option></select></div>
             <div class="f">
               <label>Departure airports <span class="meta">· type a code or city</span></label>
               <div class="typeahead">
@@ -646,8 +647,10 @@
               <div class="chips"><span class="achip"><b>PHL</b><small>Philadelphia</small><button title="Remove">✕</button></span><span class="achip"><b>EWR</b><small>Newark</small><button title="Remove">✕</button></span></div>
             </div>
 
+            </div>
+
             <div class="f" style="margin-top:4px;padding-top:12px;border-top:1px solid var(--line)">
-              <label>Run order <span class="meta">· when a run is long, which of your searches are looked up first</span></label>
+              <label>Run order <span class="meta">· when a run is long, which of your searches are looked up first. Searches with the same run order run one after the other.</span></label>
               <select><option>Low</option><option>Below normal</option><option selected>Normal</option><option>Above normal</option><option>High</option></select>
               <div class="hint">Most searches are Normal. High is for the one you're about to book.</div>
             </div>
@@ -668,8 +671,8 @@
               <div class="checks"><label><input type="checkbox" checked> Private pool</label><label><input type="checkbox"> Soaking tub</label><label><input type="checkbox"> Balcony</label><label><input type="checkbox"> Tranquility Soaking Tub™</label></div>
               <div class="hint">Vocabulary is discovered from results; a value that stops appearing is greyed, never deleted.</div></div>
             <div class="frow">
-              <div class="f"><label>Max travel time <span class="meta">each way</span></label><input type="number" value="10"> <span class="meta">h</span></div>
-              <div class="f"><label>Max stops</label><input type="number" value="1" min="0" max="3"></div>
+              <div class="f flight-only"><label>Max travel time <span class="meta">each way</span></label><input type="number" value="10"> <span class="meta">h</span></div>
+              <div class="f flight-only"><label>Max stops</label><input type="number" value="1" min="0" max="3"></div>
               <div class="f"><label>Max total price <span class="meta">room + flights</span></label><input type="number" value="9000" step="100"></div>
             </div>
           </div>
@@ -686,7 +689,7 @@
         <span class="calc"><b>2</b> <span>resorts</span></span><span class="meta">×</span>
         <span class="calc"><b>29</b> <span>check-in dates</span></span><span class="meta">=</span>
         <span class="calc"><b>58</b> <span>room lookups</span></span>
-        <span class="meta">·</span><span class="calc"><b>2</b> <span>airports</span> → <b>58</b> <span>flight lookups</span> <span class="meta">(1 gateway)</span></span>
+        <span class="flights"><span class="meta">·</span> <span class="calc"><b>2</b> <span>airports</span> → <b>58</b> <span>flight lookups</span> <span class="meta">(1 gateway)</span></span></span>
         <span class="meta">·</span><span class="calc"><span>≈</span> <b>24 min</b> <span>per run</span></span>
         <span class="sp"></span>
         <span class="warn">1 resort offline — skipped until it's back</span>
@@ -763,6 +766,7 @@
   function setRole(r){R.dataset.role=r;press('r',r);if(window.renderIssues)renderIssues();document.querySelector('.me .avatar').textContent=r==='admin'?'CW':'AS';document.querySelector('.me .who').innerHTML=(r==='admin'?'Chris Wolfgang<br><small>Admin · Sign out</small>':'Alice Smith<br><small>Editor · Sign out</small>')}
   function setDevice(d){R.dataset.device=d;press('d',d)}
   function setView(v){R.dataset.view=v;press('v',v)}
+  function setFlights(on){document.getElementById('flightFields').style.display=on?'':'none'; document.querySelectorAll('.flight-only').forEach(e=>e.style.display=on?'':'none'); document.querySelectorAll('.fanout .flights').forEach(e=>e.style.display=on?'':'none');}
   function setWindowMode(m){document.querySelectorAll('#winSeg button').forEach((b,i)=>b.setAttribute('aria-pressed', (i===0)===(m==='recurring'))); document.querySelectorAll('.win-recurring').forEach(e=>e.style.display=m==='recurring'?'':'none'); document.querySelectorAll('.win-onetime').forEach(e=>e.style.display=m==='onetime'?'':'none');}
   function setBrand(b){document.querySelectorAll('#brandSeg button').forEach((x,i)=>x.setAttribute('aria-pressed',(i===0)===(b==='sandals'))); document.querySelectorAll('.kids').forEach(e=>e.style.display=b==='beaches'?'':'none'); document.getElementById('brandHint').textContent=b==='beaches'?'Beaches resorts welcome families: children (2–15) and infants are priced differently, so they are part of the search.':'Beaches resorts are not searchable yet — the option is here so the shape is right when they are.';}
   const notes={dashboard:"Dashboard · Searches → Edit opens the editor",matrices:"Searches · click a row or Edit",editor:"Search editor · desktop-first; Phone shows the stacked fallback"};
