@@ -253,7 +253,8 @@
   .typeahead{position:relative} .typeahead .dd{position:absolute;left:0;right:0;top:100%;background:var(--surface);border:1px solid var(--line-2);border-radius:6px;box-shadow:var(--shadow);z-index:5;font-size:13px}
   .typeahead .dd div{padding:6px 10px} .typeahead .dd div:hover,.typeahead .dd div.sel{background:var(--accent-soft)}
   .checks{columns:2;column-gap:14px;font-size:13px} .checks label{display:flex;gap:7px;align-items:center;padding:3px 0;break-inside:avoid}
-  .checks label.dim{color:var(--ink-3)}
+  .checks label.dim{color:var(--ink-3);align-items:flex-start} .checks label.dim input{margin-top:3px}
+  .checks .lbl{display:flex;flex-direction:column;line-height:1.25} .checks .lbl small{font-size:11px;color:var(--ink-3)}
   [data-screen="editor"].on{padding-bottom:70px}
   .fanout{position:sticky;bottom:0;margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 -2px 8px rgba(16,24,40,.08);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px}
   .fanout .calc b{font-size:15px} .fanout .calc span{color:var(--ink-3)} .fanout .sp{flex:1}
@@ -648,12 +649,6 @@
             </div>
 
             </div>
-
-            <div class="f" style="margin-top:4px;padding-top:12px;border-top:1px solid var(--line)">
-              <label>Run order <span class="meta">· when a run is long, which of your searches are looked up first. Searches with the same run order run one after the other.</span></label>
-              <select><option>Low</option><option>Below normal</option><option selected>Normal</option><option>Above normal</option><option>High</option></select>
-              <div class="hint">Most searches are Normal. High is for the one you're about to book.</div>
-            </div>
           </div>
         </div>
 
@@ -662,7 +657,7 @@
           <h2>Digest filters <small>what the digest shows — everything is still downloaded</small></h2>
           <div class="body">
             <div class="f"><label>Room level</label>
-              <div class="checks"><label><input type="checkbox" checked> Club</label><label><input type="checkbox" checked> Butler</label><label><input type="checkbox"> Luxury</label><label class="dim"><input type="checkbox"> Premium <span class="meta">(not seen in 6 runs)</span></label></div></div>
+              <div class="checks"><label><input type="checkbox" checked> Club</label><label><input type="checkbox" checked> Butler</label><label><input type="checkbox"> Luxury</label><label class="dim"><input type="checkbox"> <span class="lbl">Premium<small>not seen in 6 runs</small></span></label></div></div>
             <div class="f"><label>Room view</label>
               <div class="checks"><label><input type="checkbox" checked> Ocean view</label><label><input type="checkbox" checked> Beachfront</label><label><input type="checkbox"> Garden view</label><label><input type="checkbox"> Pool view</label></div></div>
             <div class="f"><label>Room type</label>
@@ -671,9 +666,18 @@
               <div class="checks"><label><input type="checkbox" checked> Private pool</label><label><input type="checkbox"> Soaking tub</label><label><input type="checkbox"> Balcony</label><label><input type="checkbox"> Tranquility Soaking Tub™</label></div>
               <div class="hint">Vocabulary is discovered from results; a value that stops appearing is greyed, never deleted.</div></div>
             <div class="frow">
-              <div class="f flight-only"><label>Max travel time <span class="meta">each way</span></label><input type="number" value="10"> <span class="meta">h</span></div>
+              <div class="f flight-only"><label>Max flight time <span class="meta">incl. layovers, each way</span></label><input type="number" value="10"> <span class="meta">h</span></div>
               <div class="f flight-only"><label>Max stops</label><input type="number" value="1" min="0" max="3"></div>
+              <div class="f"><label>Max drive to resort <span class="meta">from the airport</span></label><input type="number" value="90" step="15"> <span class="meta">min</span></div>
               <div class="f"><label>Max total price <span class="meta">room + flights</span></label><input type="number" value="9000" step="100"></div>
+            </div>
+            <div class="hint">Drive time comes from the resort's distance to its gateway airport, so it applies with or without flights.</div>
+          </div>
+          <h2>Run order <small>when a run is long, which of your searches are looked up first</small></h2>
+          <div class="body">
+            <div class="f" style="max-width:220px">
+              <select><option>Low</option><option>Below normal</option><option selected>Normal</option><option>Above normal</option><option>High</option></select>
+              <div class="hint">Searches with the same run order run one after the other. Most are Normal; High is for the one you're about to book.</div>
             </div>
           </div>
           <h2>Recipients</h2>
