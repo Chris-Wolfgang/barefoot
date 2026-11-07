@@ -328,7 +328,7 @@ the system. Everything an Editor sees is reachable from a matrix they own.
 |---|---|---|
 | Landing | **Dashboard** — my matrices at a glance (status, last searched, cheapest, ▼/▲ vs last capture), last digest, next scheduled run, needs-attention (window passed, resort offline); first sign-in shows one action, "Create your first matrix" | **System dashboard** — last run (status, duration, items, failures, seconds per item), **Budget & health** (below) |
 | Work | **Searches** → **Search editor** (below) | Owner column + owner filter; "mine" by default, "all owners" toggle; can open any search |
-| Read | **Results** — matrix + *capture date* pickers (runs are Admin objects), filters-only toggle, paged grid, cheapest flight per departure airport | any owner |
+| Read | **Results** (below) — search + run pickers (runs are Admin objects), digest-filters/everything toggle, paged grid, flights per departure airport | any owner |
 | Read | **Price history** — over *my* captures only (v1) | cross-user view over all captures |
 | Read | **My digests** — every digest sent to me, rendered from the stored body, linking to its results | **Deliveries** — every delivery, status, attempts, error, resend |
 | Me | **Profile** — name/e-mail (from sign-in, read-only), time zone, default occupancy; later extra recipients | — |
@@ -355,6 +355,16 @@ resort's distance to its gateway; applies without flights), Max flight time incl
 stops (flights only). *Run order* is its own section: Low / Below normal / Normal / Above normal /
 High stored as 1 / 25 / 50 / 75 / 99; ties run in creation order. *Recipients* last. The footer shows
 resorts × dates → room lookups, airports → flight lookups, minutes per run, and holds Cancel / Save.
+
+**Results (locked 2026-11-06, mockup v37).** One search, one run. Pickers: Search name, Run (capture
+date + outcome), Find; scope *Matching my digest filters* / *Everything found*; sort defaults to
+cheapest total. One row per room option: resort and check-in, room (level, view), room price
+(regular, sale, promo), one button per departure airport with the fare range and option count, and
+the total (room + cheapest flight) with the delta against the previous run for the same resort, room
+and check-in. Clicking an airport opens that airport alone across the row: the cheapest round trip
+with its legs, then "N more" which pages the remaining options **ten at a time, price ascending**,
+from a paged flight-options endpoint per flight set — dozens of options never arrive in one response.
+Offline resorts appear as a row. Phone: cards, one airport panel at a time.
 
 **Budget & health (Admin dashboard).** Table-backed cards ship with the dashboard; the Azure
 Monitor cards follow once the API's managed identity has *Reader* on the database and
