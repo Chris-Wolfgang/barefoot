@@ -16,3 +16,9 @@ Open questions noted at the end of the session: whether "Later" should be allowe
 notice must be acknowledged; whether Admin system notices share the modal; island grouping for resort
 selection; filters as a pane vs a tab; whether the fan-out footer shows "already searched by other
 matrices" savings. Product name is a placeholder.
+
+## Decisions taken while iterating
+
+- Search **name is unique per owner** (case-insensitive, trimmed): unique index on `(OwnerId, NormalizedName)`, inline validation in the editor, 409 from the API on a race. Other users may reuse the name.
+- **Open issues** stay on the Dashboard until their `ResolvesWhen` condition clears; acknowledging only stops the pop-up (per user). The digest's needs-attention line comes from the same list.
+- First sign-in **disclaimer** is accepted once per user per disclaimer version (`AppUser.DisclaimerVersionAccepted`).
