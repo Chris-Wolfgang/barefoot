@@ -1,0 +1,818 @@
+<meta charset="utf-8">
+<title>SandalsSearch — Matrix Editor (mockup)</title>
+<style>
+  :root{
+    /* Sandals OBE scheme: cyan accent (their CONTINUE button) on clean white/navy */
+    --ink:#12293e; --ink-2:#1d3a55; --teal:#05b2e8; --teal-soft:#e3f6fd; --teal-dk:#0090bf;
+    --paper:#f4f8fb; --card:#ffffff; --line:#dfe7ee; --line-2:#c4d2dd;
+    --txt:#33475c; --txt-dim:#71859a; --txt-faint:#9badbf;
+    --ok:#2e7d4f; --ok-soft:#e5f3ea; --warn:#b26a00; --warn-soft:#fdf1dd;
+    --draft:#5b6770; --draft-soft:#eceff1;
+  }
+  *{box-sizing:border-box; margin:0}
+  html,body{height:100%}
+  body{
+    font-family:"Segoe UI",system-ui,sans-serif; color:var(--txt);
+    background:var(--paper); font-size:14px; line-height:1.45;
+  }
+  .app{display:flex; min-height:100vh}
+
+  /* ---- nav rail ---- */
+  .rail{
+    width:198px; background:var(--ink); color:#c8d4de; flex-shrink:0;
+    display:flex; flex-direction:column; padding:14px 0;
+  }
+  .rail .brand{
+    padding:4px 18px 18px; color:#fff; font-size:16px; font-weight:600; letter-spacing:.2px;
+    border-bottom:1px solid var(--ink-2); margin-bottom:10px;
+  }
+  .rail .brand small{display:block; font-weight:400; font-size:11px; color:#7d94a8; letter-spacing:.6px; text-transform:uppercase; margin-top:2px}
+  .rail a{
+    display:flex; align-items:center; gap:10px; padding:9px 18px; color:#c8d4de;
+    text-decoration:none; font-size:13.5px; border-left:3px solid transparent;
+  }
+  .rail a:hover{background:var(--ink-2)}
+  .rail a.active{background:var(--ink-2); color:#fff; border-left-color:var(--teal); font-weight:600}
+  .rail a .dot{width:7px;height:7px;border-radius:50%;background:#54687c;flex-shrink:0}
+  .rail a.active .dot{background:var(--teal)}
+  .rail .note{margin-top:auto; padding:12px 18px; font-size:11px; color:#6d8093; line-height:1.5}
+
+  /* ---- main column ---- */
+  .main{flex:1; display:flex; flex-direction:column; min-width:0}
+
+  /* header bar */
+  .hdr{
+    background:var(--card); border-bottom:1px solid var(--line);
+    padding:14px 22px 12px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .hdr .name{
+    font-size:17px; font-weight:600; color:var(--ink); border:1px solid transparent;
+    padding:4px 8px; border-radius:4px; min-width:300px;
+  }
+  .hdr .name:hover,.hdr .name:focus{border-color:var(--line-2); outline:none; background:#fffdf8}
+  .badge{font-size:11.5px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; padding:3px 10px; border-radius:20px}
+  .badge.draft{background:var(--draft-soft); color:var(--draft)}
+  .hdr .spacer{flex:1}
+  .fld{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--txt-dim)}
+  .fld input[type=number]{
+    width:58px; padding:5px 6px; border:1px solid var(--line-2); border-radius:4px;
+    font:inherit; font-variant-numeric:tabular-nums; text-align:center; color:var(--txt);
+  }
+  .btn{
+    font:inherit; font-weight:600; padding:8px 18px; border-radius:5px; cursor:pointer; border:1px solid var(--line-2);
+    background:var(--card); color:var(--txt);
+  }
+  .btn:hover{background:var(--paper)}
+  .btn.primary{background:var(--teal); border-color:var(--teal); color:#fff}
+  .btn.primary:hover{background:var(--teal-dk)}
+  .btn:focus-visible,.chk:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--teal); outline-offset:1px}
+
+  /* ---- editor body: two panes ---- */
+  .body{flex:1; display:grid; grid-template-columns:minmax(430px,7fr) minmax(340px,5fr); gap:18px; padding:18px 22px 96px; align-items:start}
+  @media (max-width:980px){.body{grid-template-columns:1fr}}
+  .pane{background:var(--card); border:1px solid var(--line); border-radius:8px; overflow:hidden}
+  .pane>h2{
+    font-size:12px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--txt-dim);
+    padding:12px 16px; border-bottom:1px solid var(--line); background:#fbfaf6;
+    display:flex; justify-content:space-between; align-items:baseline;
+  }
+  .pane>h2 em{font-style:normal; font-weight:400; font-size:11px; letter-spacing:0; text-transform:none; color:var(--txt-faint)}
+  .sec{padding:14px 16px; border-bottom:1px solid var(--line)}
+  .sec:last-child{border-bottom:none}
+  .sec h3{font-size:13px; font-weight:600; color:var(--ink); margin-bottom:9px}
+  .sec h3 small{font-weight:400; color:var(--txt-faint); font-size:11.5px}
+
+  /* resorts */
+  .island{margin-bottom:10px}
+  .island:last-child{margin-bottom:0}
+  .island .isl-hd{display:flex; align-items:baseline; gap:8px; font-size:12px; font-weight:600; color:var(--txt-dim); margin-bottom:4px}
+  .island .isl-hd .gw{font-weight:400; color:var(--txt-faint); font-variant-numeric:tabular-nums}
+  .chk{display:flex; align-items:center; gap:8px; padding:4px 6px 4px 14px; border-radius:4px; cursor:pointer; user-select:none}
+  .chk:hover{background:var(--teal-soft)}
+  .chk input{accent-color:var(--teal); width:15px; height:15px; cursor:pointer}
+  .chk .off{
+    font-size:10.5px; font-weight:600; letter-spacing:.4px; text-transform:uppercase;
+    background:var(--warn-soft); color:var(--warn); border-radius:3px; padding:1px 7px; margin-left:4px;
+  }
+  .chk.dis{color:var(--txt-faint); cursor:not-allowed}
+  .chk.dis:hover{background:none}
+
+  /* window row */
+  .row{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end}
+  .row .cell label{display:block; font-size:11.5px; color:var(--txt-dim); margin-bottom:3px}
+  .row .cell select,.row .cell input{
+    font:inherit; padding:6px 8px; border:1px solid var(--line-2); border-radius:4px; color:var(--txt);
+    font-variant-numeric:tabular-nums; background:#fff;
+  }
+  .hint{font-size:12px; color:var(--txt-dim); margin-top:9px; padding:8px 10px; background:var(--teal-soft); border-radius:4px}
+  .hint b{color:var(--teal-dk); font-variant-numeric:tabular-nums}
+  .subnote{font-size:11.5px; color:var(--txt-faint); margin-top:6px}
+
+  /* toggle */
+  .switchrow{display:flex; align-items:center; gap:10px}
+
+  /* matrix list table */
+  .mtx{width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:8px; overflow:hidden; font-size:13px}
+  .mtx th{
+    text-align:left; font-size:11px; font-weight:600; letter-spacing:.7px; text-transform:uppercase;
+    color:var(--txt-dim); background:#fafcfe; padding:10px 12px; border-bottom:1px solid var(--line);
+  }
+  .mtx td{padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  /* TEMP: vertical separators to judge column layout */
+  .mtx th,.mtx td{border-right:1px solid var(--line)}
+  .mtx th:last-child,.mtx td:last-child{border-right:none}
+  .mtx tbody tr{cursor:pointer}
+  .mtx tbody tr:hover{background:var(--teal-soft)}
+  .mtx tbody tr:last-child td{border-bottom:none}
+  .mtx .nm{font-weight:600; color:var(--ink)}
+  .mtx .num{text-align:right; font-variant-numeric:tabular-nums}
+  .mtx th.num{text-align:right}
+  .mtx small{color:var(--txt-faint); font-size:11.5px}
+  .mtx .rowact{text-align:right; white-space:nowrap}
+  .badge.active-b{background:var(--ok-soft); color:var(--ok)}
+  .badge.inactive{background:var(--draft-soft); color:var(--draft)}
+  .tag{
+    display:inline-block; font-size:10.5px; font-weight:600; letter-spacing:.3px; text-transform:uppercase;
+    background:var(--teal-soft); color:var(--teal-dk); border-radius:3px; padding:1px 6px; margin-left:4px;
+  }
+  .tag.one{background:#efe9fb; color:#6b46c1}
+  .tag.wrap{background:var(--warn-soft); color:var(--warn)}
+  .run{font-weight:600; font-size:12.5px}
+  .run.ok{color:var(--ok)}
+  .run.warn{color:var(--warn)}
+  .btn.sm{padding:5px 12px; font-size:12.5px; font-weight:600}
+
+  /* airport chips */
+  .chips{display:flex; flex-wrap:wrap; gap:6px; min-height:30px}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px; background:var(--teal-soft); color:var(--teal-dk);
+    border:1px solid #b3e6f7; border-radius:20px; padding:3px 6px 3px 12px; font-size:12.5px; font-weight:600;
+  }
+  .chip small{font-weight:400; color:var(--txt-dim)}
+  .chip button{
+    border:none; background:none; cursor:pointer; color:var(--teal-dk); font-size:14px; line-height:1;
+    padding:2px 6px; border-radius:50%;
+  }
+  .chip button:hover{background:#cceef9}
+  .filters-flight.dim, .airports.dim{opacity:.45; pointer-events:none}
+
+  /* fan-out footer */
+  .foot{
+    position:fixed; left:198px; right:0; bottom:0; background:var(--ink); color:#dfe7ee;
+    padding:12px 22px; display:flex; align-items:center; gap:26px; flex-wrap:wrap;
+    box-shadow:0 -3px 12px rgba(24,44,64,.25);
+  }
+  .foot .stat{font-size:12.5px; color:#9fb2c2}
+  .foot .stat b{display:block; font-size:17px; color:#fff; font-variant-numeric:tabular-nums; font-weight:600}
+  .foot .eq{font-size:12px; color:#7d94a8; font-variant-numeric:tabular-nums}
+  .foot .spacer{flex:1}
+  .foot .est{font-size:12px; color:#9fb2c2; text-align:right}
+  .foot .est b{color:#fff}
+  @media (max-width:980px){.foot{left:0}}
+</style>
+
+<div class="app">
+  <nav class="rail">
+    <div class="brand">SandalsSearch<small>mockup · v1</small></div>
+    <a href="#"><span class="dot"></span>Dashboard</a>
+    <a href="#" class="active" id="navMatrices"><span class="dot"></span>Matrices</a>
+    <a href="#" id="navResults"><span class="dot"></span>Results</a>
+    <a href="#"><span class="dot"></span>Price history</a>
+    <a href="#"><span class="dot"></span>Run history</a>
+    <a href="#"><span class="dot"></span>Reference data</a>
+    <a href="#"><span class="dot"></span>Settings</a>
+    <div class="note">Matrix list + editor are live in this mockup. Other screens come next.</div>
+  </nav>
+
+  <div class="main">
+
+    <!-- ============ MATRIX LIST VIEW ============ -->
+    <div id="view-list">
+      <div class="hdr">
+        <div style="font-size:17px; font-weight:600; color:var(--ink)">Search matrices</div>
+        <div class="spacer"></div>
+        <input placeholder="Filter by name…" style="font:inherit; padding:7px 10px; border:1px solid var(--line-2); border-radius:4px; width:220px">
+        <button class="btn primary" id="btnNew">New matrix</button>
+      </div>
+      <div style="padding:18px 22px">
+        <table class="mtx">
+          <thead>
+            <tr>
+              <th style="width:18%">Name</th><th>Status</th><th class="num">Priority</th><th>Window</th>
+              <th class="num">Resorts</th><th class="num">Airports</th><th>Last run</th><th class="num">Cheapest found</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="open-editor">
+              <td class="nm">Feb–Mar St. Lucia scouting</td>
+              <td><span class="badge active-b">Active</span></td>
+              <td class="num">40</td>
+              <td>10 nights · Feb 15 – Mar 15 <span class="tag">recurring</span><br><small>next resolves 2027</small></td>
+              <td class="num">3</td><td class="num">2</td>
+              <td><span class="run ok">✓ Jul 1, 2026</span><br><small>87 searches · 12 min</small></td>
+              <td class="num">$4,918 <small>w/o flight</small></td>
+              <td class="rowact"><button class="btn sm">Deactivate</button></td>
+            </tr>
+            <tr class="open-editor">
+              <td class="nm">Anniversary — Antigua</td>
+              <td><span class="badge active-b">Active</span></td>
+              <td class="num">50</td>
+              <td>7 nights · 11/28/2026 – 12/12/2026 <span class="tag one">one-time</span><br><small>auto-deactivates after 12/12/2026</small></td>
+              <td class="num">1</td><td class="num">2</td>
+              <td><span class="run ok">✓ Jul 1, 2026</span><br><small>15 searches · 2 min</small></td>
+              <td class="num">$3,204 <small>w/ flight</small></td>
+              <td class="rowact"><button class="btn sm">Deactivate</button></td>
+            </tr>
+            <tr class="open-editor">
+              <td class="nm">Bahamas December holidays</td>
+              <td><span class="badge active-b">Active</span></td>
+              <td class="num">60</td>
+              <td>7 nights · Dec 20 – Jan 10 <span class="tag">recurring</span> <span class="tag wrap">wraps NY</span><br><small>next resolves 2026→27</small></td>
+              <td class="num">2</td><td class="num">1</td>
+              <td><span class="run warn">⚠ Jul 1, 2026 partial</span><br><small>SEB offline — skipped · resumed Jul 2, 2026 ✓</small></td>
+              <td class="num">$5,566 <small>w/o flight</small></td>
+              <td class="rowact"><button class="btn sm">Deactivate</button></td>
+            </tr>
+            <tr class="open-editor">
+              <td class="nm">Jamaica summer probe</td>
+              <td><span class="badge draft">Draft</span></td>
+              <td class="num">—</td>
+              <td>5 nights · Jun 1 – Jun 30 <span class="tag">recurring</span></td>
+              <td class="num">7</td><td class="num">0</td>
+              <td><small>never run</small></td>
+              <td class="num">—</td>
+              <td class="rowact"><button class="btn sm primary">Activate</button></td>
+            </tr>
+            <tr class="open-editor">
+              <td class="nm">Curaçao exploratory</td>
+              <td><span class="badge inactive">Inactive</span></td>
+              <td class="num">—</td>
+              <td>10 nights · Sep 1 – Sep 30 <span class="tag">recurring</span></td>
+              <td class="num">1</td><td class="num">2</td>
+              <td><span class="run ok">✓ Mar 14, 2026</span><br><small>results retained</small></td>
+              <td class="num">$4,110 <small>w/ flight</small></td>
+              <td class="rowact"><button class="btn sm primary">Reactivate</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="subnote" style="margin-top:10px">Active matrices are processed in priority order (lower number = earlier). Inactive matrices keep all historical results. Click a row to open it in the editor.</div>
+      </div>
+    </div>
+
+    <!-- ============ RESULTS VIEW ============ -->
+    <div id="view-results" style="display:none">
+      <div class="hdr">
+        <div style="font-size:17px; font-weight:600; color:var(--ink)">Results</div>
+        <label class="fld">Matrix
+          <select style="font:inherit; padding:6px 8px; border:1px solid var(--line-2); border-radius:4px">
+            <option selected>Feb–Mar St. Lucia scouting</option>
+            <option>Anniversary — Antigua</option>
+            <option>Bahamas December holidays</option>
+            <option>Curaçao exploratory</option>
+          </select>
+        </label>
+        <label class="fld">Run
+          <select style="font:inherit; padding:6px 8px; border:1px solid var(--line-2); border-radius:4px">
+            <option selected>Jul 1, 2026 ✓ (latest)</option>
+            <option>Jun 27, 2026 ✓</option>
+            <option>Jun 24, 2026 ✓</option>
+          </select>
+        </label>
+        <div class="spacer"></div>
+        <label class="chk" style="padding:4px 6px"><input type="checkbox" checked id="fltOnly"> Matching filters only</label>
+        <button class="btn">Re-send digest</button>
+      </div>
+      <div style="padding:18px 22px">
+        <div style="display:flex; gap:10px; margin-bottom:10px; font-size:12.5px; color:var(--txt-dim); align-items:center; flex-wrap:wrap">
+          <span><b style="color:var(--ink)">62</b> of 214 room options match the matrix filters</span>
+          <span>·</span><span>cheapest <b style="color:var(--ink)">$4,918</b> (room only)</span>
+          <span>·</span><span>cheapest incl. flights <b style="color:var(--ink)">$6,142</b></span>
+          <span class="spacer" style="flex:1"></span>
+          <input id="resSearch" placeholder="Search resort, room, promo…" style="font:inherit; padding:6px 9px; border:1px solid var(--line-2); border-radius:4px; width:230px">
+          <label class="fld">Rows
+            <select id="resPageSize" style="font:inherit; padding:5px 6px; border:1px solid var(--line-2); border-radius:4px">
+              <option selected>10</option><option>25</option><option>50</option><option>100</option>
+            </select>
+          </label>
+        </div>
+        <table class="mtx res">
+          <thead>
+            <tr>
+              <th class="sort">Resort</th><th class="sort">Check-in</th><th class="sort" style="width:20%">Room</th>
+              <th class="sort">Level</th><th class="sort">View</th>
+              <th class="num sort">Regular</th><th class="num sort">Sale</th><th class="num sort asc">Total ▲</th>
+              <th>Promo</th><th class="sort">Flights (PHL)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Grande St. Lucian</td><td>Feb 24, 2027</td>
+              <td>Beachfront Club Level Room</td><td><span class="pill">Club</span></td><td>Beachfront</td>
+              <td class="num"><s style="color:var(--txt-faint)">$6,410</s></td><td class="num">$4,918</td><td class="num"><b>$4,918</b></td>
+              <td><small>$1,500 off + $175 spa credit</small></td>
+              <td class="flt" data-flt="a"><span class="run ok">from $612</span> <small>· 6 options · $612–$1,048</small> <span class="tag">details</span></td>
+            </tr>
+            <tr class="fltrow" id="flt-a" style="display:none">
+              <td colspan="10">
+                <div class="fdetail">
+                  <b>Cheapest flight — $612 · economy · 2 travelers</b>
+                  <div class="fleg"><span class="dir">Outbound · 6h 05m · 1 stop</span>
+                    PHL 07:10 → MIA 10:05 (AA 1204) · layover 1h 20m · MIA 11:25 → UVF 14:15 (AA 2311)</div>
+                  <div class="fleg"><span class="dir">Return · 5h 40m · 1 stop</span>
+                    UVF 15:05 → CLT 18:45 (AA 887) · layover 55m · CLT 19:40 → PHL 21:45 (AA 1650)</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Grande St. Lucian</td><td>Mar 3, 2027</td>
+              <td>Beachfront Club Level Room</td><td><span class="pill">Club</span></td><td>Beachfront</td>
+              <td class="num"><s style="color:var(--txt-faint)">$6,410</s></td><td class="num">$5,204</td><td class="num"><b>$5,204</b></td>
+              <td><small>$1,500 off</small></td>
+              <td class="flt" data-flt="b"><span class="run ok">from $644</span> <small>· 4 options · $644–$1,102</small> <span class="tag">details</span></td>
+            </tr>
+            <tr class="fltrow" id="flt-b" style="display:none">
+              <td colspan="10"><div class="fdetail"><b>Cheapest flight — $644 · economy · 2 travelers</b>
+                <div class="fleg"><span class="dir">Outbound · 8h 20m · 1 stop</span> PHL 06:00 → ATL 08:25 (DL 402) · layover 2h 10m · ATL 10:35 → UVF 14:20 (DL 1877)</div>
+                <div class="fleg"><span class="dir">Return · 6h 15m · 1 stop</span> UVF 15:40 → ATL 19:05 (DL 1878) · layover 1h · ATL 20:05 → PHL 21:55 (DL 933)</div>
+              </div></td>
+            </tr>
+            <tr>
+              <td>Regency La Toc</td><td>Feb 20, 2027</td>
+              <td>Oceanview Club Level Junior Suite</td><td><span class="pill">Club</span></td><td>Oceanview</td>
+              <td class="num"><s style="color:var(--txt-faint)">$7,120</s></td><td class="num">$5,466</td><td class="num"><b>$5,466</b></td>
+              <td><small>$1,500 off + free night</small></td>
+              <td class="flt" data-flt="c"><span class="run ok">from $598</span> <small>· 7 options · $598–$1,164</small> <span class="tag">details</span></td>
+            </tr>
+            <tr class="fltrow" id="flt-c" style="display:none">
+              <td colspan="10"><div class="fdetail"><b>Cheapest flight — $598 · economy · 2 travelers</b>
+                <div class="fleg"><span class="dir">Outbound · 9h 45m · 2 stops</span> PHL 05:45 → CLT 07:30 (AA 610) · CLT 09:00 → MIA 11:10 (AA 1421) · MIA 12:30 → UVF 15:30 (AA 2311)</div>
+                <div class="fleg"><span class="dir">Return · 5h 55m · 1 stop</span> UVF 14:50 → MIA 17:40 (AA 2312) · layover 1h 05m · MIA 18:45 → PHL 21:45 (AA 1209)</div>
+              </div></td>
+            </tr>
+            <tr>
+              <td>Halcyon Beach</td><td>Feb 17, 2027</td>
+              <td>Oceanfront Butler Suite</td><td><span class="pill">Butler</span></td><td>Oceanfront</td>
+              <td class="num"><s style="color:var(--txt-faint)">$9,880</s></td><td class="num">$7,912</td><td class="num"><b>$7,912</b></td>
+              <td><small>$1,500 off + $175 spa credit + free night</small></td>
+              <td class="flt" data-flt="d"><span class="run ok">from $612</span> <small>· 6 options · $612–$1,048</small> <span class="tag">details</span></td>
+            </tr>
+            <tr class="fltrow" id="flt-d" style="display:none">
+              <td colspan="10"><div class="fdetail"><b>Cheapest flight — $612 · economy · 2 travelers</b> <small>(same flight set as Grande St. Lucian Feb 24 — shared island gateway UVF)</small>
+                <div class="fleg"><span class="dir">Outbound · 6h 05m · 1 stop</span> PHL 07:10 → MIA 10:05 (AA 1204) · layover 1h 20m · MIA 11:25 → UVF 14:15 (AA 2311)</div>
+                <div class="fleg"><span class="dir">Return · 5h 40m · 1 stop</span> UVF 15:05 → CLT 18:45 (AA 887) · layover 55m · CLT 19:40 → PHL 21:45 (AA 1650)</div>
+              </div></td>
+            </tr>
+            <tr style="opacity:.55">
+              <td>Grande St. Lucian</td><td>Feb 15, 2027</td>
+              <td>Over-the-Water Bungalow</td><td><span class="pill">Butler</span></td><td>Private Pool</td>
+              <td class="num">—</td><td class="num">—</td><td class="num"><b>sold out</b></td>
+              <td></td><td></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pager">
+          <span>Showing <b>1–10</b> of <b>214</b></span>
+          <span class="spacer" style="flex:1"></span>
+          <button class="btn sm" disabled>◀ Prev</button>
+          <button class="btn sm pg on">1</button><button class="btn sm pg">2</button><button class="btn sm pg">3</button>
+          <span style="color:var(--txt-faint)">…</span><button class="btn sm pg">22</button>
+          <button class="btn sm">Next ▶</button>
+        </div>
+        <div class="subnote" style="margin-top:10px">Grid loads the last 10 by default; page, sort (click any header), filter, and search across the full history. Click a flights cell to expand the cheapest itinerary. Sold-out rooms are kept for history and dimmed. (Mockup shows 6 sample rows; sorting/search are live on them, paging is visual.)</div>
+      </div>
+    </div>
+
+    <!-- ============ PRICE HISTORY VIEW ============ -->
+    <div id="view-price" style="display:none">
+      <div class="hdr">
+        <div style="font-size:17px; font-weight:600; color:var(--ink)">Price history</div>
+        <label class="fld">Matrix
+          <select style="font:inherit; padding:6px 8px; border:1px solid var(--line-2); border-radius:4px">
+            <option selected>Feb–Mar St. Lucia scouting</option><option>Anniversary — Antigua</option>
+          </select>
+        </label>
+        <label class="fld">Resort
+          <select style="font:inherit; padding:6px 8px; border:1px solid var(--line-2); border-radius:4px">
+            <option selected>Grande St. Lucian</option><option>Regency La Toc</option><option>Halcyon Beach</option>
+          </select>
+        </label>
+        <label class="fld">Room
+          <select style="font:inherit; padding:6px 8px; border:1px solid var(--line-2); border-radius:4px">
+            <option selected>Beachfront Club Level Room</option><option>Oceanview Club Level Junior Suite</option>
+          </select>
+        </label>
+        <label class="fld">Check-in
+          <select style="font:inherit; padding:6px 8px; border:1px solid var(--line-2); border-radius:4px">
+            <option selected>Feb 24, 2027</option><option>Mar 3, 2027</option><option>All dates (cheapest per run)</option>
+          </select>
+        </label>
+        <div class="spacer"></div>
+      </div>
+      <div style="padding:18px 22px">
+        <div style="display:flex; gap:14px; margin-bottom:14px; flex-wrap:wrap">
+          <div class="stat-card"><small>Current (Jul 1, 2026)</small><b>$4,918</b><span class="run ok">▼ $286 vs prior run</span></div>
+          <div class="stat-card"><small>Lowest seen</small><b>$4,650</b><span>May 14, 2026</span></div>
+          <div class="stat-card"><small>Highest seen</small><b>$6,410</b><span>Jan 8, 2026</span></div>
+          <div class="stat-card"><small>Runs tracked</small><b>28</b><span>Jan 8 – Jul 1, 2026</span></div>
+        </div>
+        <div class="pane" style="padding:16px">
+          <div style="display:flex; gap:16px; align-items:center; margin-bottom:8px; font-size:12.5px">
+            <label class="chk" style="padding-left:0"><input type="checkbox" checked disabled> Sale price</label>
+            <label class="chk" style="padding-left:0"><input type="checkbox" checked disabled> Regular price</label>
+            <label class="chk" style="padding-left:0"><input type="checkbox" disabled> Room + cheapest flight</label>
+            <span class="spacer" style="flex:1"></span>
+            <span style="color:var(--txt-faint); font-size:11.5px">one point per run · 2 runs/week</span>
+          </div>
+          <svg id="phChart" viewBox="0 0 1080 320" style="width:100%; height:auto" role="img" aria-label="Price history chart"></svg>
+        </div>
+        <div class="subnote" style="margin-top:10px">Dashed line = regular (strike-through) price; solid = sale price. The gap between them is discount depth. Hover markers show run date and exact price in the real app; the lowest-seen point is flagged.</div>
+      </div>
+    </div>
+
+    <!-- ============ EDITOR VIEW ============ -->
+    <div id="view-editor" style="display:none">
+    <div class="hdr">
+      <button class="btn sm" id="btnBack" title="Back to matrix list">← List</button>
+      <div class="name" contenteditable="true" spellcheck="false">Feb–Mar St. Lucia scouting</div>
+      <span class="badge draft">Draft</span>
+      <div class="spacer"></div>
+      <label class="fld">Priority <input type="number" value="50" min="1" max="99"></label>
+      <button class="btn">Save draft</button>
+      <button class="btn primary">Activate</button>
+    </div>
+
+    <div class="body">
+      <!-- ============ SEARCH AXES ============ -->
+      <section class="pane">
+        <h2>Search axes <em>what gets downloaded</em></h2>
+
+        <div class="sec">
+          <h3>Resorts <small>· grouped by island — one flight set per island</small></h3>
+          <div id="resorts">
+            <div class="island" data-gw="UVF">
+              <div class="isl-hd">Saint Lucia <span class="gw">· gateway UVF</span></div>
+              <label class="chk"><input type="checkbox" class="r" data-gw="UVF" checked> Sandals Grande St. Lucian</label>
+              <label class="chk"><input type="checkbox" class="r" data-gw="UVF" checked> Sandals Regency La Toc</label>
+              <label class="chk"><input type="checkbox" class="r" data-gw="UVF" checked> Sandals Halcyon Beach</label>
+            </div>
+            <div class="island" data-gw="ANU">
+              <div class="isl-hd">Antigua <span class="gw">· gateway ANU</span></div>
+              <label class="chk"><input type="checkbox" class="r" data-gw="ANU"> Sandals Grande Antigua</label>
+            </div>
+            <div class="island" data-gw="NAS">
+              <div class="isl-hd">Bahamas <span class="gw">· gateway NAS / GGT</span></div>
+              <label class="chk"><input type="checkbox" class="r" data-gw="NAS"> Sandals Royal Bahamian</label>
+              <label class="chk dis"><input type="checkbox" disabled> Sandals Emerald Bay <span class="off">offline since 3/15/2024</span></label>
+            </div>
+            <div class="island" data-gw="GND">
+              <div class="isl-hd">Grenada <span class="gw">· gateway GND</span></div>
+              <label class="chk"><input type="checkbox" class="r" data-gw="GND"> Sandals Grenada</label>
+            </div>
+            <div class="island" data-gw="BGI">
+              <div class="isl-hd">Barbados <span class="gw">· gateway BGI</span></div>
+              <label class="chk"><input type="checkbox" class="r" data-gw="BGI"> Sandals Barbados</label>
+              <label class="chk"><input type="checkbox" class="r" data-gw="BGI"> Sandals Royal Barbados</label>
+            </div>
+          </div>
+          <div class="subnote">Offline resorts stay in the matrix but are skipped and noted in the digest. They resume automatically if they come back online.</div>
+        </div>
+
+        <div class="sec">
+          <h3>Check-in window &amp; stay</h3>
+          <div style="display:flex; gap:18px; margin-bottom:10px">
+            <label class="chk" style="padding-left:0"><input type="radio" name="wmode" id="wmRecur" checked> Recurring every year</label>
+            <label class="chk" style="padding-left:0"><input type="radio" name="wmode" id="wmOnce"> One time only</label>
+          </div>
+          <div class="row" id="recurRow">
+            <div class="cell"><label>Earliest check-in</label>
+              <select id="mStart"><option>Jan</option><option selected>Feb</option><option>Mar</option><option>Apr</option><option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option></select>
+              <input id="dStart" type="number" value="15" min="1" max="31" style="width:54px">
+            </div>
+            <div class="cell"><label>Latest check-in</label>
+              <select id="mEnd"><option>Jan</option><option>Feb</option><option selected>Mar</option><option>Apr</option><option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option></select>
+              <input id="dEnd" type="number" value="15" min="1" max="31" style="width:54px">
+            </div>
+            <div class="cell"><label>Nights</label><input id="nights" type="number" value="10" min="1" max="21" style="width:60px"></div>
+          </div>
+          <div class="row" id="onceRow" style="display:none">
+            <div class="cell"><label>Earliest check-in</label><input id="dateStart" type="date" value="2027-02-15"></div>
+            <div class="cell"><label>Latest check-in</label><input id="dateEnd" type="date" value="2027-03-15"></div>
+            <div class="cell"><label>Nights</label><input id="nightsOnce" type="number" value="10" min="1" max="21" style="width:60px"></div>
+          </div>
+          <div class="hint" id="windowHint"></div>
+        </div>
+
+        <div class="sec">
+          <h3>Occupancy</h3>
+          <div class="row">
+            <div class="cell"><label>Adults</label><input type="number" value="2" min="1" max="4" style="width:56px"></div>
+            <div class="cell"><label>Children</label><input type="number" value="0" min="0" max="6" style="width:56px" disabled></div>
+            <div class="cell"><label>Infants</label><input type="number" value="0" min="0" max="3" style="width:56px" disabled></div>
+          </div>
+          <div class="subnote">Sandals is couples-only — children/infants unlock when Beaches support arrives.</div>
+        </div>
+
+        <div class="sec">
+          <h3>Flights</h3>
+          <label class="chk switchrow" style="padding-left:0"><input type="checkbox" id="flights" checked> Include flights <span style="color:var(--txt-faint);font-size:12px">(airfare captured separately from room price)</span></label>
+          <div class="airports" id="airportsBox" style="margin-top:8px">
+            <div class="row">
+              <div class="cell" style="flex:1; min-width:260px"><label>Departure airports — search by code or name, add as many as you need</label>
+                <div class="chips" id="airportChips"></div>
+                <div style="display:flex; gap:6px; margin-top:6px">
+                  <input id="airportInput" list="airportList" placeholder="e.g. PHL or Philadelphia" style="flex:1; font:inherit; padding:6px 8px; border:1px solid var(--line-2); border-radius:4px">
+                  <button class="btn" id="airportAdd" type="button">Add</button>
+                </div>
+                <datalist id="airportList"></datalist>
+              </div>
+              <div class="cell"><label>Cabin</label>
+                <select><option selected>Economy</option><option>Premium Economy</option><option>Business</option><option>First</option></select>
+              </div>
+            </div>
+            <div class="subnote">Airfare is only bookable ~6 months out. Searches beyond that horizon store room-only prices and pick up airfare automatically once in range.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ FILTER CRITERIA ============ -->
+      <section class="pane">
+        <h2>Filter criteria <em>what the digest shows — never limits the download</em></h2>
+
+        <div class="sec">
+          <h3>Room level</h3>
+          <label class="chk"><input type="checkbox" checked> Butler level</label>
+          <label class="chk"><input type="checkbox" checked> Club level</label>
+          <label class="chk"><input type="checkbox"> Luxury level</label>
+        </div>
+
+        <div class="sec">
+          <h3>Room view</h3>
+          <label class="chk"><input type="checkbox" checked> Oceanfront</label>
+          <label class="chk"><input type="checkbox" checked> Oceanview</label>
+          <label class="chk"><input type="checkbox" checked> Beachfront</label>
+          <label class="chk"><input type="checkbox"> Private pool</label>
+          <label class="chk"><input type="checkbox"> Tropical garden</label>
+          <label class="chk"><input type="checkbox"> Pool</label>
+        </div>
+
+        <div class="sec">
+          <h3>Room type <small>· any selected</small></h3>
+          <label class="chk"><input type="checkbox"> Over-the-water bungalow</label>
+          <label class="chk"><input type="checkbox"> Rondoval villa</label>
+          <label class="chk"><input type="checkbox"> Private pool suite</label>
+          <label class="chk"><input type="checkbox"> Villa suite</label>
+          <label class="chk"><input type="checkbox"> Walkout suite</label>
+          <label class="chk"><input type="checkbox"> One-bedroom suite</label>
+        </div>
+
+        <div class="sec">
+          <h3>Room features</h3>
+          <label class="chk"><input type="checkbox"> Balcony</label>
+          <label class="chk"><input type="checkbox"> Patio</label>
+          <label class="chk"><input type="checkbox"> Tranquility soaking tub</label>
+          <label class="chk"><input type="checkbox"> Wheelchair accessible</label>
+        </div>
+
+        <div class="sec filters-flight" id="flightFilters">
+          <h3>Flight constraints <small>· evaluated per direction</small></h3>
+          <div class="row">
+            <div class="cell"><label>Max travel time (hrs)</label><input type="number" value="10" min="1" max="36" style="width:60px"></div>
+            <div class="cell"><label>Max stops</label><select><option>Nonstop only</option><option selected>1</option><option>2</option><option>Any</option></select></div>
+          </div>
+          <div class="subnote">These trim the digest, not the download — every flight option is stored, so loosening a constraint later needs no re-run.</div>
+        </div>
+
+        <div class="sec">
+          <h3>Price cap <small>· optional</small></h3>
+          <div class="row">
+            <div class="cell"><label>Max total per room (USD)</label><input type="number" placeholder="—" style="width:110px"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ FAN-OUT FOOTER ============ -->
+    <div class="foot">
+      <div class="stat">Room searches<b id="fRooms">—</b></div>
+      <div class="eq" id="fRoomsEq"></div>
+      <div class="stat">Flight sets<b id="fFlights">—</b></div>
+      <div class="eq" id="fFlightsEq"></div>
+      <div class="spacer"></div>
+      <div class="est">Estimated run <b id="fTime">—</b><br>at 1 req / 2.5 s, politeness-throttled</div>
+    </div>
+    </div><!-- /view-editor -->
+  </div>
+</div>
+
+<script>
+  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+  const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const DIM=[31,28,31,30,31,30,31,31,30,31,30,31];
+
+  /* ---- airports: type-ahead + chips ---- */
+  const AIRPORTS=[
+    ["AVP","Wilkes-Barre/Scranton"],["PHL","Philadelphia"],["EWR","Newark"],["JFK","New York JFK"],
+    ["LGA","New York LaGuardia"],["BWI","Baltimore/Washington"],["IAD","Washington Dulles"],
+    ["DCA","Washington National"],["ABE","Allentown"],["MDT","Harrisburg"],["PIT","Pittsburgh"],
+    ["BOS","Boston"],["ATL","Atlanta"],["CLT","Charlotte"],["MIA","Miami"],["FLL","Fort Lauderdale"],
+    ["MCO","Orlando"],["TPA","Tampa"],["ORD","Chicago O'Hare"],["DFW","Dallas/Fort Worth"],
+    ["IAH","Houston"],["DEN","Denver"],["LAX","Los Angeles"],["SFO","San Francisco"],["SEA","Seattle"]
+  ];
+  let chips=["AVP","PHL"];
+  const dl=$("#airportList");
+  AIRPORTS.forEach(([c,n])=>{const o=document.createElement("option");o.value=c;o.label=`${c} — ${n}`;dl.appendChild(o);});
+
+  function renderChips(){
+    const box=$("#airportChips"); box.innerHTML="";
+    chips.forEach(code=>{
+      const ap=AIRPORTS.find(a=>a[0]===code);
+      const el=document.createElement("span"); el.className="chip";
+      el.innerHTML=`${code} <small>${ap?ap[1]:""}</small>`;
+      const x=document.createElement("button"); x.type="button"; x.textContent="×"; x.title=`Remove ${code}`;
+      x.onclick=()=>{chips=chips.filter(c=>c!==code); renderChips(); recalc();};
+      el.appendChild(x); box.appendChild(el);
+    });
+  }
+  function addAirport(){
+    const v=$("#airportInput").value.trim().toUpperCase();
+    if(!v) return;
+    const hit=AIRPORTS.find(a=>a[0]===v)||AIRPORTS.find(a=>a[1].toUpperCase().includes(v));
+    if(hit && !chips.includes(hit[0])){ chips.push(hit[0]); renderChips(); recalc(); }
+    $("#airportInput").value="";
+  }
+  $("#airportAdd").onclick=addAirport;
+  $("#airportInput").addEventListener("keydown",e=>{ if(e.key==="Enter"){e.preventDefault(); addAirport();} });
+
+  /* ---- window mode toggle ---- */
+  function windowMode(){ return $("#wmRecur").checked ? "recur" : "once"; }
+  function syncWindowMode(){
+    const recur=windowMode()==="recur";
+    $("#recurRow").style.display=recur?"":"none";
+    $("#onceRow").style.display=recur?"none":"";
+  }
+
+  function windowDaysRecur(){
+    const ms=$("#mStart").selectedIndex, me=$("#mEnd").selectedIndex;
+    const ds=+$("#dStart").value||1, de=+$("#dEnd").value||1;
+    if(ms===me && ds<=de) return de-ds+1;
+    let m=ms,d=ds,count=0;
+    for(let i=0;i<400;i++){
+      count++;
+      if(m===me&&d===de)break;
+      d++; if(d>DIM[m]){d=1;m=(m+1)%12;}
+    }
+    return count;
+  }
+  function windowDaysOnce(){
+    const s=$("#dateStart").valueAsDate, e=$("#dateEnd").valueAsDate;
+    if(!s||!e||e<s) return 0;
+    return Math.round((e-s)/86400000)+1;
+  }
+
+  function recalc(){
+    syncWindowMode();
+    const resorts=$$(".r:checked");
+    const nR=resorts.length;
+    const islands=new Set(resorts.map(c=>c.dataset.gw)).size;
+    const recur=windowMode()==="recur";
+    const days=recur?windowDaysRecur():windowDaysOnce();
+    const flightsOn=$("#flights").checked;
+    const nA=flightsOn ? chips.length : 0;
+
+    const roomSearches=nR*days;
+    const flightSets=flightsOn ? islands*days*nA : 0;
+
+    $("#fRooms").textContent=roomSearches.toLocaleString();
+    $("#fRoomsEq").textContent=`${nR} resorts × ${days} dates`;
+    $("#fFlights").textContent=flightSets.toLocaleString();
+    $("#fFlightsEq").textContent=flightsOn?`${islands} islands × ${days} dates × ${nA} airports (deduped)`:"flights off";
+
+    const secs=(roomSearches+flightSets)*2.5;
+    const m=Math.round(secs/60);
+    $("#fTime").textContent=m<1?"<1 min":`≈ ${m} min`;
+
+    if(recur){
+      const sM=MONTHS[$("#mStart").selectedIndex], eM=MONTHS[$("#mEnd").selectedIndex];
+      const wrap=$("#mEnd").selectedIndex<$("#mStart").selectedIndex;
+      $("#windowHint").innerHTML=
+        `Window <b>${sM} ${$("#dStart").value} – ${eM} ${$("#dEnd").value}${wrap?" (wraps New Year)":""}</b> · <b>${days}</b> candidate check-in dates`+
+        ` · recurring: currently resolves to <b>2027</b>, rolls to 2028 once the window end + lead time passes`;
+    } else {
+      $("#windowHint").innerHTML=
+        `Window <b>${$("#dateStart").value} – ${$("#dateEnd").value}</b> · <b>${days}</b> candidate check-in dates`+
+        ` · one time only: auto-deactivates (with a note in the digest) once the window passes`;
+    }
+
+    $("#flightFilters").classList.toggle("dim",!flightsOn);
+    $("#airportsBox").classList.toggle("dim",!flightsOn);
+  }
+
+  document.addEventListener("change",recalc);
+  document.addEventListener("input",e=>{ if(e.target.id!=="airportInput") recalc(); });
+  renderChips();
+  recalc();
+
+  /* ---- view switching: list <-> editor ---- */
+  function showView(v){
+    $("#view-list").style.display = v==="list" ? "" : "none";
+    $("#view-editor").style.display = v==="editor" ? "" : "none";
+    $("#view-results").style.display = v==="results" ? "" : "none";
+    $("#view-price").style.display = v==="price" ? "" : "none";
+    $("#navMatrices").classList.toggle("active", v==="list"||v==="editor");
+    $("#navResults").classList.toggle("active", v==="results");
+    $("#navPrice").classList.toggle("active", v==="price");
+    window.scrollTo(0,0);
+  }
+
+  /* ---- price history chart (static sample data; one point per run) ---- */
+  (function drawChart(){
+    const sale=[6180,6180,6035,6035,5890,5890,5890,5740,5740,5820,5820,5660,5520,5520,5380,5380,5240,5100,5100,4980,4650,4650,4720,4870,4870,5010,5204,4918];
+    const reg =[6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410,6410];
+    const W=1080,H=320,L=64,R=16,T=18,B=40;
+    const lo=4400,hi=6600;
+    const x=i=>L+(W-L-R)*i/(sale.length-1);
+    const y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+    const svg=document.getElementById("phChart");
+    let g="";
+    for(let v=4500; v<=6500; v+=500){
+      g+=`<line x1="${L}" y1="${y(v)}" x2="${W-R}" y2="${y(v)}" stroke="#e6edf5" stroke-width="1"/>`;
+      g+=`<text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#9badbf" font-family="Segoe UI">$${v.toLocaleString()}</text>`;
+    }
+    const months=["Jan","Feb","Mar","Apr","May","Jun","Jul"];
+    months.forEach((m,i)=>{
+      const xi=L+(W-L-R)*i/(months.length-1);
+      g+=`<text x="${xi}" y="${H-14}" text-anchor="middle" font-size="11" fill="#9badbf" font-family="Segoe UI">${m} 2026</text>`;
+    });
+    const pts=sale.map((v,i)=>`${x(i)},${y(v)}`).join(" ");
+    g+=`<polygon points="${L},${y(lo)} ${pts} ${x(sale.length-1)},${y(lo)}" fill="#05b2e8" opacity="0.08"/>`;
+    g+=`<polyline points="${reg.map((v,i)=>`${x(i)},${y(v)}`).join(" ")}" fill="none" stroke="#9badbf" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+    g+=`<polyline points="${pts}" fill="none" stroke="#05b2e8" stroke-width="2.5"/>`;
+    sale.forEach((v,i)=>{ g+=`<circle cx="${x(i)}" cy="${y(v)}" r="2.5" fill="#05b2e8"/>`; });
+    const minI=sale.indexOf(Math.min(...sale));
+    g+=`<circle cx="${x(minI)}" cy="${y(sale[minI])}" r="5.5" fill="none" stroke="#2e7d4f" stroke-width="2"/>`;
+    g+=`<text x="${x(minI)}" y="${y(sale[minI])+20}" text-anchor="middle" font-size="11" font-weight="600" fill="#2e7d4f" font-family="Segoe UI">lowest $4,650</text>`;
+    const lastI=sale.length-1;
+    g+=`<circle cx="${x(lastI)}" cy="${y(sale[lastI])}" r="5" fill="#05b2e8"/>`;
+    g+=`<text x="${x(lastI)-6}" y="${y(sale[lastI])-10}" text-anchor="end" font-size="12" font-weight="600" fill="#0090bf" font-family="Segoe UI">$4,918</text>`;
+    g+=`<text x="${W-R}" y="${y(reg[0])-8}" text-anchor="end" font-size="11" fill="#9badbf" font-family="Segoe UI">regular $6,410</text>`;
+    svg.innerHTML=g;
+  })();
+  /* rail navigation via delegation (robust to nested spans/text nodes) */
+  document.querySelector(".rail").addEventListener("click",e=>{
+    const a=e.target.closest("a"); if(!a) return;
+    e.preventDefault();
+    if(a.id==="navMatrices") showView("list");
+    else if(a.id==="navResults") showView("results");
+    else if(a.id==="navPrice") showView("price");
+  });
+  $$(".res .flt").forEach(td=>td.addEventListener("click",()=>{
+    const row=$("#flt-"+td.dataset.flt);
+    row.style.display = row.style.display==="none" ? "" : "none";
+  }));
+
+  /* results: live search over sample rows (flight-detail rows follow their parent) */
+  $("#resSearch").addEventListener("input",()=>{
+    const q=$("#resSearch").value.toLowerCase();
+    $$(".res tbody tr:not(.fltrow)").forEach(tr=>{
+      const hit=!q || tr.textContent.toLowerCase().includes(q);
+      tr.style.display=hit?"":"none";
+      const d=tr.querySelector(".flt"); if(d && !hit){ const fr=$("#flt-"+d.dataset.flt); if(fr) fr.style.display="none"; }
+    });
+  });
+
+  /* results: click-to-sort on sample rows */
+  $$(".res th.sort").forEach((th)=>{
+    th.addEventListener("click",()=>{
+      const tb=$(".res tbody");
+      const idx=[...th.parentNode.children].indexOf(th);
+      const dir=th.classList.contains("asc")?-1:1;
+      $$(".res th.sort").forEach(h=>{h.classList.remove("asc","desc"); h.textContent=h.textContent.replace(/ [▲▼]$/,"");});
+      th.classList.add(dir===1?"asc":"desc");
+      th.textContent=th.textContent.replace(/ [▲▼]$/,"")+(dir===1?" ▲":" ▼");
+      // collect (row, detailRow) pairs so itineraries travel with their room row
+      const pairs=$$(".res tbody tr:not(.fltrow)").map(tr=>{
+        const d=tr.querySelector(".flt");
+        return {tr, det: d ? $("#flt-"+d.dataset.flt) : null};
+      });
+      const val=tr=>{
+        const t=tr.children[idx]?.textContent.trim()||"";
+        const n=parseFloat(t.replace(/[$,]/g,"").match(/-?[\d.]+/)?.[0]);
+        return isNaN(n)?t.toLowerCase():n;
+      };
+      pairs.sort((a,b)=>{const x=val(a.tr),y=val(b.tr); return (x<y?-1:x>y?1:0)*dir;});
+      pairs.forEach(p=>{ tb.appendChild(p.tr); if(p.det) tb.appendChild(p.det); });
+    });
+  });
+  $$("#view-list .open-editor").forEach(tr=>{
+    tr.addEventListener("click",e=>{
+      if(e.target.closest(".rowact")) return;          // activate buttons don't navigate
+      const nm=tr.querySelector(".nm").textContent;
+      $("#view-editor .name").textContent=nm;
+      showView("editor");
+    });
+  });
+  $$("#view-list .rowact .btn").forEach(b=>b.addEventListener("click",e=>e.stopPropagation()));
+  $("#btnNew").addEventListener("click",()=>{ $("#view-editor .name").textContent="New matrix"; showView("editor"); });
+  $("#btnBack").addEventListener("click",()=>showView("list"));
+  $("#navMatrices").addEventListener("click",e=>{ e.preventDefault(); showView("list"); });
+</script>
